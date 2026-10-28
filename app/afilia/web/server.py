@@ -106,10 +106,10 @@ def politica_publica(pol: Politica) -> dict[str, Any]:
     def pregunta(pid: str) -> dict[str, Any]:
         p = pol.preguntas[pid]
         return {
-            "id": p.id, "texto": p.texto, "ayuda": p.ayuda, "tipo": p.tipo, "clave": p.clave,
+            "id": p.id, "texto": p.texto, "corta": p.corta, "ayuda": p.ayuda, "tipo": p.tipo, "clave": p.clave,
             "bloque": p.bloque, "mostrar_si": {k: list(v) for k, v in p.mostrar_si},
             "opciones": [{
-                "id": o.id, "texto": o.texto, "nivel": o.nivel, "tope": o.tope, "descarta": o.descarta,
+                "id": o.id, "texto": o.texto, "corto": o.corto, "nivel": o.nivel, "tope": o.tope, "descarta": o.descarta,
                 "motivo": o.motivo, "activa": list(o.activa), "condiciones": list(o.condiciones),
                 "documentos": list(o.documentos), "alternativas": list(o.alternativas),
                 "servicio_comite": o.servicio_comite,

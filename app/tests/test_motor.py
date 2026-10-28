@@ -104,11 +104,11 @@ def test_motivos_ordenados_del_mas_grave_al_menos(politica):
 
 
 def test_mensaje_no_aplica_ofrece_alternativas_y_revision(politica):
-    r = _ev(politica, comercio={"nombre": "Vapes PTY", "descripcion": "vapes"},
-            respuestas={"tabaco_que_vende": "vapeadores"})
+    r = _ev(politica, comercio={"nombre": "Tabaquería PTY", "descripcion": "puros y habanos"},
+            respuestas={"tabaco_que_vende": "tabaco", "tabaco_excluir": "no"})
     assert r["nivel"] == "no_aplica"
     m = r["mensaje_comercio"]
-    assert m.startswith("Hola, Vapes PTY.")
+    assert m.startswith("Hola, Tabaquería PTY.")
     assert "se clasificó por error" in m
     assert "Afiliar solo la línea de negocio permitida" in m
     assert "Para avanzar" not in m  # no se piden documentos si hoy no aplica
@@ -144,3 +144,38 @@ def test_preliminar_no_concluye(politica):
     assert r["estado"] == "preliminar"
     assert r["resumen"].startswith("Faltan") and "No es una conclusión" in r["resumen"]
     assert r["pasos"][0].startswith("Responder las preguntas clave")
+
+
+def test_cada_pregunta_trae_su_version_corta_y_la_reaccion(politica):
+    r = _ev(politica, comercio=BARES, respuestas={"alcohol_que_paga": "experiencia"})
+    p = next(p for p in r["preguntas"] if p["id"] == "alcohol_que_paga")
+    assert p["corta"] == "Cuando el cliente paga, ¿qué recibe?"
+    assert next(o for o in p["opciones"] if o["id"] == "experiencia")["corto"] == "🎟️ Una experiencia o tour"
+    assert p["reaccion"] == [{"nivel": "condicionado", "texto": politica.preguntas["alcohol_que_paga"].opcion(
+        "experiencia").motivo}]
+    sin = next(p for p in r["preguntas"] if p["id"] == "alcohol_peso")
+    assert sin["reaccion"] == []
+
+
+def test_un_no_confirmado_cierra_el_caso_sin_las_preguntas_generales(politica):
+    r = _ev(politica, comercio={"descripcion": "vapes"}, respuestas={"tabaco_que_vende": "vapeadores"})
+    assert r["nivel"] == "no_aplica" and r["estado"] == "completo"
+    assert not any(p["clave"] for p in r["preguntas"] if p["categoria"] is None)
+
+
+def test_antes_de_concluir_no_se_ofrece_afiliar_solo_lo_permitido(politica):
+    r = _ev(politica, comercio={"descripcion": "licores y abarrotes"}, respuestas={"alcohol_que_paga": "venta_directa"})
+    assert r["estado"] == "preliminar" and r["siguiente"] == "alcohol_excluir"
+
+
+def test_un_no_por_palabra_clave_sin_aclarar_no_cierra_el_caso(politica):
+    r = _ev(politica, comercio={"descripcion": "vapes"})
+    assert r["estado"] == "preliminar"
+    assert any(p["clave"] for p in r["preguntas"] if p["categoria"] is None)
+
+
+def test_sin_camino_el_mensaje_no_promete_alternativas(politica):
+    r = _ev(politica, comercio={"descripcion": "vapes"}, respuestas={"tabaco_que_vende": "vapeadores"})
+    assert r["nivel"] == "no_aplica" and r["alternativas"] == []
+    assert "forma de trabajar juntos" not in r["mensaje_comercio"]
+    assert "se clasificó por error" in r["mensaje_comercio"]

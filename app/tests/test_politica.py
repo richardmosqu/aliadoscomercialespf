@@ -113,3 +113,11 @@ def test_la_huella_cambia_al_editar(copia_politica):
     _reemplazar(copia_politica / "alternativas.yaml", "Cobrar con PagueloFacil solo el servicio",
                 "Cobrar solo el servicio")
     assert cargar_politica(copia_politica).huella != antes
+
+
+def test_cada_opcion_tiene_etiqueta_corta_para_la_burbuja(politica):
+    for p in politica.preguntas.values():
+        for o in p.opciones:
+            assert o.corto, f"{p.id} › {o.id} no tiene 'corto'"
+            assert len(o.corto) <= 40, f"{p.id} › {o.id}: '{o.corto}' es muy larga para una burbuja"
+        assert len(p.corta or p.texto) <= 70, f"{p.id}: agrega 'corta' (la pregunta es muy larga para la burbuja)"

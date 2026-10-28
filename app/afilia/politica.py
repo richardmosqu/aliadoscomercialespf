@@ -52,6 +52,7 @@ def patron_palabra(palabra: str) -> re.Pattern[str]:
 class Opcion:
     id: str
     texto: str
+    corto: str = ""  # etiqueta de la burbuja en la conversación (si falta, se usa texto)
     nivel: str | None = None
     motivo: str = ""
     tope: str | None = None
@@ -68,6 +69,7 @@ class Pregunta:
     id: str
     texto: str
     opciones: tuple[Opcion, ...]
+    corta: str = ""  # cómo la hace la burbuja en la conversación (si falta, se usa texto)
     tipo: str = "unica"
     clave: bool = False
     ayuda: str = ""
@@ -180,6 +182,7 @@ def _opcion(datos: Any, donde: str) -> Opcion:
     return Opcion(
         id=oid,
         texto=_texto(datos, "texto", donde),
+        corto=_texto(datos, "corto", donde, requerido=False),
         nivel=nivel,
         motivo=motivo,
         tope=tope,
@@ -210,6 +213,7 @@ def _pregunta(datos: Any, donde: str, categoria: str | None) -> Pregunta:
     return Pregunta(
         id=pid,
         texto=_texto(datos, "texto", donde),
+        corta=_texto(datos, "corta", donde, requerido=False),
         opciones=opciones,
         tipo=tipo,
         clave=bool(datos.get("clave", False)),

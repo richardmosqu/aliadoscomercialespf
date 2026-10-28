@@ -58,10 +58,23 @@ Ejemplo (resumido de `categorias.yaml`):
           motivo: No vende bebidas alcohólicas; la palabra clave era un falso positivo.
 ```
 
+## Campos de una pregunta
+
+| Campo | Efecto |
+| --- | --- |
+| `texto` | La pregunta completa (va al resumen del comité) |
+| `corta` | Cómo la hace Ali en la conversación, si `texto` es largo (máx. 70 caracteres) |
+| `clave: true` | Define el resultado: mientras falte, el caso queda "Por aclarar" |
+| `ayuda` | Lo que se muestra con "💡 ¿Por qué lo pregunto?" |
+| `tipo: multiple` | Se pueden elegir varias respuestas |
+| `mostrar_si` | La pregunta aparece solo con ciertas respuestas |
+
 ## Campos de una opción
 
 | Campo | Efecto |
 | --- | --- |
+| `texto` | La respuesta completa (va al resumen del comité) |
+| `corto` | La etiqueta de la burbuja, con emoji si ayuda (obligatoria, máx. 40 caracteres) |
 | `nivel` + `motivo` | Nivel de la actividad con esa respuesta (en preguntas generales: de toda la evaluación) |
 | `tope` + `motivo` | Nivel máximo de la actividad |
 | `descarta: true` + `motivo` | La actividad no aplica (falso positivo) |
@@ -77,6 +90,7 @@ Ejemplo (resumido de `categorias.yaml`):
 - **No inventar datos de PagueloFacil** (comisiones, plazos, límites, requisitos). Lo que no esté confirmado se marca `origen: propuesta` o `por_confirmar: true`, y se anota en `docs/03-preguntas-para-cumplimiento.md`.
 - **Las alternativas cambian el negocio real, no la descripción.** Nunca proponer disfrazar una actividad (transaction laundering).
 - **Comillas en valores dudosos.** YAML lee `no`, `sí`, `+18` o `1:1` como otra cosa: escribir `"no"`, `"+18"`, `"1:1"`. La app avisa si falta.
+- **"Afiliar solo lo permitido" antes del "no".** Las actividades no permitidas tienen una pregunta `*_excluir` con `clave: true`: Ali la hace antes de concluir.
 - Los `id` no se cambian una vez en uso: el historial y los casos de referencia los nombran. Para retirar una opción, se borra y se actualizan los casos.
 - Al cambiar algo, actualizar `version` en `categorias.yaml`. Cuando Cumplimiento apruebe la política completa, `estado: aprobado`.
 

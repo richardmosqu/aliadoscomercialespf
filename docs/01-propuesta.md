@@ -13,12 +13,14 @@ Que cada analista de Cumplimiento llegue a una recomendación clara, explicable 
 
 ## Cómo funciona
 
-1. El analista escribe lo que el comercio dice que vende.
-2. El evaluador detecta actividades a aclarar (palabras clave de la política) y muestra sus preguntas. Ninguna palabra rechaza por sí sola.
-3. El analista responde (o le pregunta al comercio). Cada respuesta actualiza el semáforo en vivo y puede abrir, cerrar o descartar preguntas.
-4. Resultado: nivel (Aplica / Aplica con condiciones / Requiere comité / No aplica por ahora), motivos con la respuesta que los produjo, condiciones, documentos a pedir, **caminos para afiliar**, próximos pasos, mensaje para el comercio y resumen del expediente.
-5. El analista guarda la evaluación con su decisión final. El historial queda para el equipo.
-6. Opcional: la IA lee la descripción, el formulario o la web, y sugiere la actividad real, respuestas con evidencia y preguntas para el comercio. El analista decide qué aplicar.
+Una conversación con **Ali**, una burbuja de PagueloFacil, pensada para que cualquiera la use sin capacitación:
+
+1. El analista escribe en una frase qué vende el comercio.
+2. Ali muestra las actividades que detectó (palabras clave de la política) y aclara con preguntas, una a la vez. Ninguna palabra rechaza por sí sola.
+3. Las respuestas son burbujas que se tocan. Cada una puede abrir, cerrar o descartar preguntas, y Ali reacciona explicando lo que cambió. "No sé" guarda la pregunta para el comercio.
+4. Resultado en grande: Aplica / Aplica con condiciones / Requiere comité / No aplica por ahora, con las condiciones y los **caminos para afiliar** en burbujas.
+5. Cuatro botones: mensaje para el comercio, documentos (con casillas), resumen para el comité y guardar con la decisión final. El historial queda para el equipo.
+6. Opcional: la IA lee cada mensaje, dice lo que entiende, marca con ✨ la respuesta que respalda el texto y suma preguntas para el comercio. El analista decide.
 
 ## Qué no hace
 

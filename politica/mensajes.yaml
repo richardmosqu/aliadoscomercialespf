@@ -25,6 +25,10 @@ por_nivel:
     Revisamos la información de tu negocio. Por las políticas de nuestras redes y de cumplimiento, hoy no podemos
     procesar pagos para esta actividad tal como está planteada. Queremos ayudarte a encontrar una forma de trabajar
     juntos:
+  # Cuando no hay ningún camino (por ejemplo, una actividad prohibida por ley).
+  no_aplica_sin_camino: >-
+    Revisamos la información de tu negocio. Por las políticas de nuestras redes y de cumplimiento, no podemos procesar
+    pagos para esta actividad.
 
 bloques:
   documentos: "Para avanzar, por favor compártenos:"
@@ -43,7 +47,7 @@ pasos:
     - Activar cuando estén completos y anotar las condiciones en la cuenta.
   comite:
     - Enviar al comercio el formulario en línea y el documento de Evaluación de Debida Diligencia Comercial.
-    - Llevar al comité el expediente con el resumen de este evaluador (botón "Copiar resumen").
+    - Llevar al comité el expediente con el resumen del caso (botón "Resumen").
     - Ofrecer las alternativas mientras el comité decide (por ejemplo, empezar con enlace de pago).
   no_aplica:
     - Revisar con el comercio si alguna alternativa se ajusta a cómo opera de verdad.

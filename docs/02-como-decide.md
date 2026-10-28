@@ -6,7 +6,7 @@ El motor (`app/afilia/motor.py`) es determinista: con los mismos datos y respues
 
 1. **Se evalúa lo que el cliente paga, no las palabras.** La pregunta central de cada actividad es "¿qué recibe el cliente cuando paga?".
 2. **Una palabra clave nunca rechaza sola.** Solo activa preguntas. El analista puede quitar una actividad mal detectada o agregar una que falte.
-3. **Sin preguntas clave no hay conclusión.** Mientras falten, el semáforo dice "Por aclarar" y muestra hacia dónde va.
+3. **Sin preguntas clave no hay conclusión.** Mientras falten, Ali dice "Por aclarar" y muestra hacia dónde va. Un "no aplica" confirmado por las respuestas, con la actividad aclarada, cierra el caso sin preguntas generales (no pueden cambiarlo).
 4. **Primero buscar cómo afiliar.** Todo resultado distinto de "Aplica" trae alternativas concretas.
 5. **Las alternativas cambian el negocio real, nunca la descripción.** Disfrazar una actividad no permitida es causa de cierre.
 6. **Explicable.** Cada motivo cita la respuesta y la política (pública o propuesta).
@@ -26,7 +26,7 @@ El motor (`app/afilia/motor.py`) es determinista: con los mismos datos y respues
 
 | Paso | Qué pasa |
 | --- | --- |
-| Descripción: "Venta de licor. Tour por bares con licor incluido" | Se activan **Bebidas alcohólicas** (licor, bares) y **Experiencias** (tour). Semáforo: Por aclarar (si se confirma: no aplica) |
+| Descripción: "Venta de licor. Tour por bares con licor incluido" | Se activan **Bebidas alcohólicas** (licor, bares) y **Experiencias** (tour). Ali: Por aclarar (si se confirma: no aplica) |
 | ¿Qué recibe el cliente? → una experiencia o tour | Alcohol pasa a "Aplica con condiciones": es turismo, no venta de licor. Aparecen las preguntas de seguimiento |
 | ¿Qué parte del precio son bebidas? → menos de la mitad | Sin cambio (con "la mitad o más" iría a comité) |
 | ¿Quién vende las bebidas? → los bares aliados con su licencia | Condición: cobrar con PagueloFacil solo el servicio. Documento: acuerdo con los locales |

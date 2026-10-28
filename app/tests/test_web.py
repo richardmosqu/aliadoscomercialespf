@@ -31,7 +31,7 @@ def test_estado_local_sin_acceso(cliente):
 
 def test_pagina_principal(cliente):
     r = cliente.get("/")
-    assert r.status_code == 200 and "Evaluador de aliados" in r.text
+    assert r.status_code == 200 and "Hola, soy Ali" in r.text
     assert cliente.get("/static/app.js").status_code == 200
 
 

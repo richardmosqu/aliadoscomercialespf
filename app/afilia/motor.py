@@ -141,6 +141,8 @@ def evaluar(pol: Politica, entrada: Entrada) -> dict[str, Any]:
     servicios: list[str] = []
     niveles: list[str] = []
     categorias_out: list[dict[str, Any]] = []
+    no_por_respuesta = False  # un "no aplica" que salió de una respuesta (no de una palabra clave sin aclarar)
+    clave_cat_pendientes = False
 
     def registrar(o: Opcion) -> None:
         _agregar(condiciones, o.condiciones)
@@ -157,6 +159,7 @@ def evaluar(pol: Politica, entrada: Entrada) -> dict[str, Any]:
         topes = [o.tope for _, o in elegidas if o.tope]
         pendientes_cat = [pid for pid in cat.preguntas if pid in visibles and pol.preguntas[pid].clave
                           and pid not in cuentan]
+        clave_cat_pendientes = clave_cat_pendientes or bool(pendientes_cat)
         nivel = None
         if not descartada:
             nivel = _maximo(niveles_cat, cat.nivel)
@@ -164,6 +167,7 @@ def evaluar(pol: Politica, entrada: Entrada) -> dict[str, Any]:
                 tope = min(topes, key=RANGO.__getitem__)
                 if RANGO[nivel] > RANGO[tope]:
                     nivel = tope
+            no_por_respuesta = no_por_respuesta or (nivel == "no_aplica" and bool(niveles_cat))
         motivos_cat = []
         if not descartada and not niveles_cat:
             motivos_cat.append({"nivel": cat.nivel, "texto": cat.por_que, "pregunta": None, "respuesta": None,
@@ -204,6 +208,7 @@ def evaluar(pol: Politica, entrada: Entrada) -> dict[str, Any]:
         for o in _elegidas(pregunta, cuentan):
             if o.nivel:
                 niveles.append(o.nivel)
+                no_por_respuesta = no_por_respuesta or o.nivel == "no_aplica"
                 motivos.append({"nivel": o.nivel, "texto": o.motivo, "pregunta": pregunta.texto,
                                 "respuesta": o.texto, "base": False, "origen": pregunta.bloque or "General"})
             registrar(o)
@@ -213,6 +218,7 @@ def evaluar(pol: Politica, entrada: Entrada) -> dict[str, Any]:
             continue
         if regla.nivel:
             niveles.append(regla.nivel)
+            no_por_respuesta = no_por_respuesta or regla.nivel == "no_aplica"
             motivos.append({"nivel": regla.nivel, "texto": regla.motivo, "pregunta": None, "respuesta": None,
                             "base": False, "origen": "Combinación de respuestas"})
         _agregar(condiciones, regla.condiciones)
@@ -225,22 +231,30 @@ def evaluar(pol: Politica, entrada: Entrada) -> dict[str, Any]:
     if nivel_global == "comite":
         _agregar(alternativas, [ALTERNATIVA_COMITE])
     motivos.sort(key=lambda m: -RANGO[m["nivel"]])
+    # Un "no aplica" confirmado por las respuestas, con la actividad ya aclarada (incluida la pregunta de afiliar
+    # solo lo permitido), no lo cambia ninguna pregunta general: esas dejan de ser clave y el caso se cierra.
+    decidido_no = nivel_global == "no_aplica" and no_por_respuesta and not clave_cat_pendientes
 
     preguntas_out = []
     for pid in visibles:
         p = pol.preguntas[pid]
         respuesta = list(cuentan.get(pid, ()))
+        elegidas_p = _elegidas(p, cuentan)
         preguntas_out.append({
             "id": p.id,
             "texto": p.texto,
+            "corta": p.corta or p.texto,
             "ayuda": p.ayuda,
             "tipo": p.tipo,
-            "clave": p.clave,
+            "clave": p.clave and not (decidido_no and p.categoria is None),
             "categoria": p.categoria,
             "bloque": pol.categorias[p.categoria].nombre if p.categoria else (p.bloque or "General"),
             "seccion": BLOQUE_ACTIVIDAD if p.categoria else "Perfil y riesgo",
-            "opciones": [{"id": o.id, "texto": o.texto} for o in p.opciones],
+            "opciones": [{"id": o.id, "texto": o.texto, "corto": o.corto or o.texto} for o in p.opciones],
             "respuesta": respuesta if p.tipo == "multiple" else (respuesta[0] if respuesta else None),
+            # Lo que la respuesta cambió, para que la conversación lo cuente en el momento.
+            "reaccion": [{"nivel": o.nivel or o.tope or ("descartada" if o.descarta else None), "texto": o.motivo}
+                         for o in elegidas_p if o.motivo],
         })
     pendientes = [p["id"] for p in preguntas_out if p["clave"] and not p["respuesta"]]
     sin_responder = [p["id"] for p in preguntas_out if not p["respuesta"]]
@@ -296,15 +310,17 @@ def mensaje_comercio(pol: Politica, r: dict[str, Any]) -> str:
     m = pol.mensajes
     nombre = r["comercio"]["nombre"] or "[nombre del comercio]"
     nivel = r["nivel"]
-    partes = [m["saludo"].format(nombre=nombre), " ".join(m["por_nivel"][nivel].split())]
+    caminos = [a for a in r["alternativas"] if a["id"] != ALTERNATIVA_COMITE] if nivel in ("comite", "no_aplica") else []
+    texto_nivel = m["por_nivel"][nivel]
+    if nivel == "no_aplica" and not caminos:
+        texto_nivel = m["por_nivel"].get("no_aplica_sin_camino", texto_nivel)
+    partes = [m["saludo"].format(nombre=nombre), " ".join(texto_nivel.split())]
     if r["documentos"] and nivel != "no_aplica":
         partes.append(m["bloques"]["documentos"] + "\n" + "\n".join(f"- {d['nombre']}" for d in r["documentos"]))
     if r["servicios_comite"]:
         partes.append(m["bloques"]["servicios"] + "\n" + "\n".join(f"- {s}" for s in r["servicios_comite"]))
-    if r["alternativas"] and nivel in ("comite", "no_aplica"):
-        visibles = [a for a in r["alternativas"] if a["id"] != ALTERNATIVA_COMITE]
-        if visibles:
-            partes.append(m["bloques"]["alternativas"] + "\n" + "\n".join(f"- {a['titulo']}" for a in visibles))
+    if caminos:
+        partes.append(m["bloques"]["alternativas"] + "\n" + "\n".join(f"- {a['titulo']}" for a in caminos))
     if nivel == "no_aplica":
         partes.append(m["bloques"]["revision"])
     partes.append(m["despedida"])

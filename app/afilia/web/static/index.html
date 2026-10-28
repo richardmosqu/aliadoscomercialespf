@@ -2,220 +2,82 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Evaluador de aliados · PagueloFacil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f8ef">
+  <title>Ali · Aliados PagueloFacil</title>
   <link rel="icon" href="/static/logo-icono.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@300;400;500;600;700&display=swap">
   <link rel="stylesheet" href="/static/estilos.css">
 </head>
-<body>
+<body data-fase="inicio" data-nivel="reposo">
+  <div class="aura" aria-hidden="true"><span></span><span></span><span></span></div>
+
   <section class="acceso" id="acceso" hidden>
-    <div class="acceso-tarjeta">
-      <img src="/static/logo-paguelofacil.svg" alt="PagueloFacil" class="acceso-logo" width="148" height="32">
-      <h1>Evaluador de aliados</h1>
-      <p>Cumplimiento · inicia sesión con tu correo de la empresa.</p>
-      <form class="acceso-form" id="form-acceso">
-        <label>Correo de la empresa
-          <input id="correo" type="email" autocomplete="email" maxlength="254" required>
-        </label>
-        <label>Clave de acceso
-          <input id="clave-acceso" type="password" autocomplete="current-password" maxlength="200" required>
-        </label>
-        <button type="submit" class="boton boton-ancho">Entrar</button>
-      </form>
-      <p class="acceso-error" id="acceso-error" role="alert" hidden></p>
-    </div>
+    <div class="orbe orbe-acceso" aria-hidden="true"><span class="halo"></span><span class="nucleo"></span><span class="brillo"></span></div>
+    <h1>Hola, soy Ali</h1>
+    <p>Te ayudo a saber si un comercio puede ser aliado de PagueloFacil.</p>
+    <form class="acceso-form" id="form-acceso">
+      <input id="correo" type="email" autocomplete="email" maxlength="254" placeholder="tu.correo@paguelofacil.com" aria-label="Correo de la empresa" required>
+      <input id="clave-acceso" type="password" autocomplete="current-password" maxlength="200" placeholder="Clave de acceso" aria-label="Clave de acceso" required>
+      <button type="submit" class="boton-principal">Entrar</button>
+    </form>
+    <p class="acceso-error" id="acceso-error" role="alert" hidden></p>
   </section>
 
   <div class="app" id="app" hidden>
-    <header class="barra">
+    <header class="arriba">
       <div class="marca">
-        <img src="/static/logo-paguelofacil.svg" alt="PagueloFacil" class="logo" width="148" height="32">
-        <span class="producto">Evaluador de aliados</span>
-        <span class="interno">Cumplimiento · uso interno</span>
+        <img src="/static/logo-paguelofacil.svg" alt="PagueloFacil" width="148" height="32">
+        <span>Aliados</span>
       </div>
-      <nav class="pestanas" aria-label="Secciones">
-        <button type="button" class="pestana activa" data-vista="evaluar">Evaluar</button>
-        <button type="button" class="pestana" data-vista="historial">Historial</button>
-        <button type="button" class="pestana" data-vista="politica">Política</button>
+      <nav class="iconos" aria-label="Opciones">
+        <button type="button" class="icono" id="btn-nuevo" title="Nuevo caso" aria-label="Nuevo caso">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button type="button" class="icono" id="btn-historial" title="Casos guardados" aria-label="Casos guardados">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+        </button>
+        <button type="button" class="icono" id="btn-politica" title="Lo que sabe Ali" aria-label="Lo que sabe Ali">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h9.5L19 9v10.5H5z"/><path d="M14 4.5V9h5M8.5 13h7M8.5 16.5h5"/></svg>
+        </button>
+        <button type="button" class="icono" id="btn-salir" title="Salir" aria-label="Salir" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5H6v14h8M10 12h10M17 8.5l3.5 3.5-3.5 3.5"/></svg>
+        </button>
       </nav>
-      <div class="barra-acciones">
-        <span class="usuario" id="usuario"></span>
-        <button type="button" class="boton-secundario" id="btn-salir" hidden>Salir</button>
-        <button type="button" class="boton" id="btn-nueva">Nueva evaluación</button>
-      </div>
     </header>
 
-    <p class="aviso-global" id="aviso-global" role="alert" hidden></p>
-
-    <!-- ───────────── Evaluar ───────────── -->
-    <main class="vista" id="vista-evaluar">
-      <div class="columna">
-        <section class="tarjeta" aria-labelledby="t-comercio">
-          <div class="tarjeta-cabecera">
-            <span class="paso">1</span>
-            <div>
-              <h2 id="t-comercio">El comercio</h2>
-              <p>Escribe lo que el comercio dice que vende. El evaluador detecta las actividades a aclarar mientras escribes.</p>
-            </div>
-          </div>
-          <form class="formulario" id="form-comercio" autocomplete="off">
-            <label>Nombre comercial
-              <input name="nombre" maxlength="200" placeholder="Ej.: Ruta de Bares PTY">
-            </label>
-            <label>Razón social
-              <input name="razon_social" maxlength="200" placeholder="Ej.: Ruta de Bares, S.A.">
-            </label>
-            <label class="ancho">Actividad declarada en el formulario
-              <input name="actividad" maxlength="400" placeholder="Ej.: Venta de licor">
-            </label>
-            <label class="ancho">¿Qué vende de verdad? ¿Qué recibe el cliente cuando paga?
-              <textarea name="descripcion" rows="3" maxlength="4000" placeholder="Ej.: Tours guiados por bares del Casco Antiguo; la entrada incluye un trago en cada bar."></textarea>
-            </label>
-            <label class="ancho">Sitio web o redes
-              <input name="web" maxlength="400" placeholder="Ej.: instagram.com/rutadebarespty">
-            </label>
-          </form>
-          <details class="ia" id="bloque-ia" hidden>
-            <summary>Analizar con IA <span class="chip">opcional</span></summary>
-            <p class="ayuda">La IA lee la descripción (y lo que pegues aquí: el formulario del comercio, su web o sus redes) y sugiere la actividad real, respuestas con evidencia y preguntas para el comercio. Tú decides qué aplicar; el resultado lo sigue calculando la política.</p>
-            <textarea id="ia-adicional" rows="4" maxlength="20000" placeholder="Pega aquí información adicional del comercio (opcional). No pegues datos de tarjetas ni contraseñas."></textarea>
-            <div class="fila-acciones">
-              <button type="button" class="boton" id="btn-ia">Analizar con IA</button>
-              <span class="ayuda" id="ia-estado" aria-live="polite"></span>
-            </div>
-          </details>
-        </section>
-
-        <section class="tarjeta" id="tarjeta-ia" aria-labelledby="t-ia" hidden>
-          <div class="tarjeta-cabecera">
-            <span class="paso paso-ia">IA</span>
-            <div>
-              <h2 id="t-ia">Lectura de la IA</h2>
-              <p>Sugerencias para revisar. Aplica solo las que estén respaldadas por lo que dijo el comercio.</p>
-            </div>
-          </div>
-          <div id="ia-resultado"></div>
-        </section>
-
-        <section class="tarjeta" aria-labelledby="t-actividad">
-          <div class="tarjeta-cabecera">
-            <span class="paso">2</span>
-            <div>
-              <h2 id="t-actividad">Actividades a aclarar</h2>
-              <p>Una palabra clave no decide nada: solo abre preguntas. Quita las que no correspondan o agrega las que falten.</p>
-            </div>
-          </div>
-          <div id="actividades"></div>
-          <div class="agregar">
-            <label for="sel-agregar">¿Falta una actividad?</label>
-            <select id="sel-agregar"><option value="">Agregar actividad…</option></select>
-          </div>
-          <p class="ayuda" id="quitadas"></p>
-        </section>
-
-        <section class="tarjeta" aria-labelledby="t-preguntas">
-          <div class="tarjeta-cabecera">
-            <span class="paso">3</span>
-            <div>
-              <h2 id="t-preguntas">Preguntas</h2>
-              <p>Las marcadas <span class="chip chip-clave">clave</span> definen el resultado. Cada respuesta actualiza la recomendación.</p>
-            </div>
-          </div>
-          <div id="preguntas"></div>
-        </section>
+    <div class="velo" aria-hidden="true"></div>
+    <main class="escena">
+      <div class="escenario">
+        <div class="orbe" id="orbe" aria-hidden="true"><span class="halo"></span><span class="nucleo"></span><span class="brillo"></span></div>
+        <button type="button" class="pildora" id="pildora" hidden></button>
       </div>
-
-      <aside class="panel" id="panel" aria-labelledby="t-recomendacion">
-        <section class="tarjeta resultado" id="resultado">
-          <h2 id="t-recomendacion" class="solo-lector">Recomendación</h2>
-          <div class="semaforo" id="semaforo" aria-live="polite">
-            <span class="semaforo-luz" aria-hidden="true"></span>
-            <div>
-              <span class="semaforo-etiqueta" id="semaforo-etiqueta">—</span>
-              <span class="semaforo-estado" id="semaforo-estado"></span>
-            </div>
-          </div>
-          <p class="resumen" id="resumen"></p>
-          <div class="progreso" id="progreso" hidden>
-            <div class="barra-progreso"><span id="barra-progreso"></span></div>
-            <button type="button" class="enlace" id="btn-siguiente">Ir a la siguiente pregunta</button>
-          </div>
-          <div id="detalle"></div>
-        </section>
-
-        <section class="tarjeta" aria-labelledby="t-mensaje">
-          <div class="subtitulo">
-            <h3 id="t-mensaje">Mensaje para el comercio</h3>
-            <button type="button" class="accion" id="btn-copiar-mensaje">Copiar</button>
-          </div>
-          <p class="ayuda">Borrador: revísalo antes de enviarlo. No explica criterios internos.</p>
-          <p class="nota" id="aviso-mensaje" hidden>Faltan preguntas clave: no envíes este mensaje todavía.</p>
-          <pre class="borrador" id="mensaje"></pre>
-        </section>
-
-        <section class="tarjeta" aria-labelledby="t-expediente">
-          <div class="subtitulo">
-            <h3 id="t-expediente">Expediente</h3>
-          </div>
-          <p class="ayuda">Resumen del caso para el comité o para consultar a la jefatura.</p>
-          <div class="fila-acciones">
-            <button type="button" class="accion" id="btn-copiar-resumen">Copiar resumen</button>
-            <button type="button" class="accion" id="btn-descargar">Descargar (.md)</button>
-          </div>
-          <form class="guardar" id="form-guardar">
-            <label>Decisión final
-              <select id="decision"></select>
-            </label>
-            <label>Notas del analista
-              <textarea id="notas" rows="3" maxlength="4000" placeholder="Qué se decidió y por qué, quién lo aprobó…"></textarea>
-            </label>
-            <div class="fila-acciones">
-              <button type="submit" class="boton">Guardar evaluación</button>
-              <span class="ayuda" id="guardado" aria-live="polite"></span>
-            </div>
-          </form>
-        </section>
-      </aside>
-
-      <a class="resumen-movil" id="resumen-movil" href="#panel" data-nivel="">
-        <span class="semaforo-luz" aria-hidden="true"></span>
-        <span><strong id="movil-etiqueta">—</strong> <span id="movil-estado"></span></span>
-        <span class="resumen-movil-ver">Ver<span class="texto-ancho"> recomendación</span> ↓</span>
-      </a>
+      <div class="conversacion" id="conversacion" aria-live="polite"></div>
     </main>
 
-    <!-- ───────────── Historial ───────────── -->
-    <main class="vista" id="vista-historial" hidden>
-      <section class="tarjeta ancha">
-        <div class="subtitulo">
-          <h2>Evaluaciones del equipo</h2>
-          <input type="search" id="buscar" placeholder="Buscar por comercio, analista o notas" maxlength="100">
-        </div>
-        <div class="tabla-envoltura">
-          <table class="tabla">
-            <thead><tr><th>Fecha</th><th>Comercio</th><th>Recomendación</th><th>Decisión</th><th>Analista</th><th></th></tr></thead>
-            <tbody id="lista-historial"></tbody>
-          </table>
-        </div>
-      </section>
-    </main>
-
-    <!-- ───────────── Política ───────────── -->
-    <main class="vista" id="vista-politica" hidden>
-      <section class="tarjeta ancha">
-        <div class="subtitulo">
-          <h2>Lo que sabe el evaluador</h2>
-          <input type="search" id="filtro-politica" placeholder="Filtrar (ej.: alcohol, rifa, péptidos)" maxlength="100">
-        </div>
-        <p class="ayuda" id="politica-version"></p>
-        <p class="ayuda">Para cambiar la política se editan los archivos de <code>politica/</code> en el repositorio (guía en <code>politica/README.md</code>). <span class="chip chip-propuesta">propuesta</span> = práctica de la industria por validar con Cumplimiento; <span class="chip chip-publica">pública</span> = está en los términos y condiciones de PagueloFacil.</p>
-        <div id="politica"></div>
-      </section>
-    </main>
+    <form class="compositor" id="compositor" autocomplete="off">
+      <textarea id="entrada" rows="1" maxlength="4000" placeholder="Escribe qué vende el comercio…" aria-label="Mensaje para Ali"></textarea>
+      <button type="submit" class="enviar" aria-label="Enviar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg>
+      </button>
+    </form>
   </div>
+
+  <div class="hoja" id="hoja" hidden>
+    <div class="hoja-panel" role="dialog" aria-modal="true" aria-labelledby="hoja-titulo">
+      <div class="hoja-cabecera">
+        <h2 id="hoja-titulo"></h2>
+        <button type="button" class="icono" id="hoja-cerrar" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="hoja-cuerpo" id="hoja-cuerpo"></div>
+    </div>
+  </div>
+
+  <div class="aviso" id="aviso" role="status" hidden></div>
 
   <script src="/static/app.js"></script>
 </body>
