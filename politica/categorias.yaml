@@ -1,0 +1,1000 @@
+# Categorías de actividad que el evaluador reconoce, con sus preguntas de aclaración.
+#
+# Cómo se lee (detalle en politica/README.md):
+# - nivel: lo que pasa si la categoría se confirma y nadie la aclara.
+#     aplica | condicionado (aplica con condiciones) | comite (requiere comité) | no_aplica
+# - origen: publica = está en los términos y condiciones públicos de PagueloFacil.
+#           propuesta = práctica de la industria (reglas de las marcas de tarjeta, riesgo, ley); Cumplimiento la valida.
+# - palabras_clave: activan la categoría para PREGUNTAR, nunca para decidir. Sin tildes ni mayúsculas da igual;
+#   un * al final acepta cualquier terminación (licor* = licor, licores, licorería).
+# - preguntas: la primera marcada clave es la que aclara qué vende de verdad. Cada opción puede tener:
+#     nivel + motivo     → nivel de la categoría con esa respuesta (gana el más alto)
+#     tope               → nivel máximo de la categoría (para afiliar solo la parte permitida)
+#     descarta: true     → la categoría no aplica (falso positivo)
+#     activa: [ids]      → suma otras categorías (por ejemplo, el tour de bares activa experiencias)
+#     condiciones, documentos, alternativas, servicio_comite
+#   mostrar_si: {pregunta: [opciones]} → la pregunta aparece solo con esas respuestas.
+version: "2026-10-28.2"
+estado: propuesta
+
+categorias:
+  # ───────────────────────────── Lista pública de actividades no permitidas ─────────────────────────────
+
+  - id: alcohol
+    nombre: Bebidas alcohólicas
+    nivel: no_aplica
+    origen: publica
+    por_que: >-
+      Los términos y condiciones de PagueloFacil excluyen el alcohol y el tabaco. La restricción es sobre vender
+      bebidas alcohólicas; un servicio donde las bebidas son un complemento se evalúa por el servicio.
+    palabras_clave: [licor*, alcohol, alcoholic*, bebidas alcoholicas, cerveza*, cerveceria*, vino, vinos, vinoteca*,
+      ron, whisky, whiskey, vodka, tequila, ginebra, aguardiente, destilado*, coctel*, cocteleria, mixologia,
+      bar, bares, pub, pubs, cantina*, discoteca*, licoreria*, happy hour, cata, catas, cata de vinos,
+      barra libre, open bar, bartender*, pub crawl, bar hopping]
+    alternativas: [cobrar_solo_servicio, afiliar_linea_permitida]
+    preguntas:
+      - id: alcohol_que_paga
+        clave: true
+        texto: Cuando el cliente paga con PagueloFacil, ¿qué recibe exactamente?
+        corta: "Cuando el cliente paga, ¿qué recibe?"
+        ayuda: >-
+          La política se aplica a lo que el cliente compra, no a las palabras con que el comercio describe su negocio.
+          Caso real: un comercio declaró "venta de licor" y en realidad vendía tours por bares.
+        opciones:
+          - id: venta_directa
+            texto: Bebidas alcohólicas para llevar o a domicilio (botellas, licorería, delivery, tienda en línea)
+            corto: "🍾 Botellas o delivery"
+            nivel: no_aplica
+            motivo: La venta directa de bebidas alcohólicas está en la lista de actividades no permitidas.
+          - id: experiencia
+            texto: Una experiencia o servicio (tour, cata guiada, clase de coctelería, evento) que incluye bebidas
+            corto: "🎟️ Una experiencia o tour"
+            nivel: condicionado
+            motivo: >-
+              El cliente paga por una experiencia: la actividad es turismo o entretenimiento, no venta de licor.
+            activa: [experiencias_eventos]
+          - id: consumo_local
+            texto: Comida o bebidas que se consumen en su propio local (restaurante, bar, discoteca)
+            corto: "🍽️ Consumo en su local"
+            nivel: condicionado
+            motivo: >-
+              Consumo en el local: es un restaurante o bar, no venta de licor para llevar (por confirmar con
+              Cumplimiento si la restricción de alcohol cubre a los bares).
+            activa: [restaurantes]
+          - id: sin_alcohol
+            texto: Nada con alcohol (accesorios, cristalería, bebidas sin alcohol, alcohol en gel u otro producto)
+            corto: "🙅 Nada con alcohol"
+            descarta: true
+            motivo: No vende bebidas alcohólicas; la palabra clave era un falso positivo.
+
+      - id: alcohol_peso
+        clave: true
+        mostrar_si: {alcohol_que_paga: [experiencia, consumo_local]}
+        texto: ¿Qué parte de lo que cobra corresponde a bebidas alcohólicas?
+        corta: "¿Cuánto del precio son bebidas?"
+        ayuda: Si las bebidas son lo principal, el servicio puede ser una forma de vender licor.
+        opciones:
+          - id: menos_mitad
+            texto: Menos de la mitad (lo central es el servicio, la guía o la comida)
+            corto: "Menos de la mitad"
+          - id: mas_mitad
+            texto: La mitad o más (las bebidas son lo principal)
+            corto: "La mitad o más"
+            nivel: comite
+            motivo: >-
+              Las bebidas son la mayor parte de lo que se cobra: el comité decide si es un servicio o una venta de licor.
+            alternativas: [cobrar_solo_servicio, expediente_comite]
+          - id: no_sabe
+            texto: No se sabe todavía
+            corto: "No se sabe"
+            condiciones: [Pedir al comercio el desglose del precio (servicio frente a bebidas).]
+            documentos: [descripcion_ampliada]
+
+      - id: alcohol_quien_vende
+        clave: true
+        mostrar_si: {alcohol_que_paga: [experiencia, consumo_local]}
+        texto: ¿Quién vende o sirve las bebidas alcohólicas?
+        corta: "¿Quién vende las bebidas?"
+        opciones:
+          - id: local_aliado
+            texto: Los bares o locales aliados, con su propia licencia
+            corto: "🍸 Los bares aliados"
+            condiciones: [Las bebidas las vende el local aliado con su licencia; lo ideal es que el comercio cobre con PagueloFacil solo su servicio.]
+            documentos: [acuerdo_locales_aliados]
+            alternativas: [cobrar_solo_servicio]
+          - id: propio_con_licencia
+            texto: El mismo comercio, con licencia para vender alcohol
+            corto: "✅ Él, con licencia"
+            documentos: [licencia_alcohol]
+          - id: propio_sin_licencia
+            texto: El mismo comercio, sin licencia
+            corto: "⚠️ Él, sin licencia"
+            nivel: no_aplica
+            motivo: >-
+              Vende alcohol sin licencia: no se procesa hasta que la tenga o hasta que las bebidas las venda un local
+              con licencia.
+            alternativas: [tramitar_licencia, cobrar_solo_servicio]
+
+      - id: alcohol_edad
+        mostrar_si: {alcohol_que_paga: [experiencia, consumo_local]}
+        texto: ¿Verifica que sus clientes sean mayores de edad (18 años o más)?
+        corta: "¿Verifica que sean mayores de 18?"
+        opciones:
+          - id: si
+            texto: Sí
+            corto: "Sí"
+          - id: "no"
+            texto: "No"
+            corto: "No"
+            condiciones: [Verificar la mayoría de edad al reservar y al prestar el servicio.]
+            alternativas: [verificacion_edad]
+
+      - id: alcohol_excluir
+        clave: true
+        mostrar_si: {alcohol_que_paga: [venta_directa]}
+        texto: ¿Vende además productos permitidos y acepta no cobrar el alcohol con PagueloFacil?
+        corta: "¿Acepta no cobrar el licor con nosotros?"
+        ayuda: Por ejemplo, un minisúper que vende comestibles y también licor.
+        opciones:
+          - id: si_mayoria_permitida
+            texto: Sí, y lo permitido es la mayor parte de su negocio
+            corto: "Sí, el licor es lo de menos"
+            tope: condicionado
+            motivo: Se afilia solo la línea permitida, con carta compromiso de exclusión.
+            documentos: [carta_exclusion]
+            alternativas: [afiliar_linea_permitida]
+          - id: si_mayoria_alcohol
+            texto: Sí, pero el alcohol es lo principal
+            corto: "Sí, pero el licor es lo principal"
+            tope: comite
+            motivo: El alcohol es lo principal del negocio; el comité decide si la afiliación parcial es viable.
+            documentos: [carta_exclusion]
+            alternativas: [afiliar_linea_permitida, expediente_comite]
+          - id: "no"
+            texto: "No"
+            corto: "No"
+
+  - id: tabaco_vapeo
+    nombre: Tabaco y vapeadores
+    nivel: no_aplica
+    origen: publica
+    por_que: >-
+      Los términos y condiciones de PagueloFacil excluyen el tabaco y los vapeadores. En Panamá, además, la venta de
+      cigarrillos electrónicos y vapeadores está prohibida por ley (Ley 315 de 2022; verificar con Legal).
+    palabras_clave: [tabaco*, tabaqueria*, cigarro*, cigarrillo*, puro, puros, habano*, vape, vapes, vaper*,
+      vapeador*, vapeo, cigarrillo electronico, cigarrillos electronicos, e-liquid, eliquid, hookah, narguil*, shisha,
+      cachimba*, nicotina, iqos]
+    preguntas:
+      - id: tabaco_que_vende
+        clave: true
+        texto: ¿Qué vende exactamente relacionado con tabaco o nicotina?
+        corta: "¿Qué vende de tabaco o nicotina?"
+        opciones:
+          - id: vapeadores
+            texto: Vapeadores, cigarrillos electrónicos, líquidos o tabaco calentado
+            corto: "💨 Vapes"
+            nivel: no_aplica
+            motivo: >-
+              Vapeadores y cigarrillos electrónicos están en la lista de actividades no permitidas, y en Panamá su venta
+              está prohibida por ley.
+          - id: tabaco
+            texto: Cigarrillos, puros, habanos o tabaco para fumar o para hookah
+            corto: "🚬 Tabaco o puros"
+            nivel: no_aplica
+            motivo: La venta de tabaco está en la lista de actividades no permitidas.
+            alternativas: [afiliar_linea_permitida]
+          - id: lounge
+            texto: Un lounge o club donde se consume en el local junto con otros servicios
+            corto: "🛋️ Un lounge"
+            nivel: comite
+            motivo: Servicio con consumo de tabaco en el local; el comité decide.
+            alternativas: [cobrar_solo_servicio, expediente_comite]
+          - id: sin_tabaco
+            texto: Nada con tabaco ni nicotina (la palabra se usa en otro sentido)
+            corto: "🙅 Nada con tabaco"
+            descarta: true
+            motivo: No vende tabaco ni nicotina; la palabra clave era un falso positivo.
+
+      - id: tabaco_excluir
+        clave: true
+        mostrar_si: {tabaco_que_vende: [tabaco, lounge]}
+        texto: ¿Vende además productos permitidos y acepta no cobrar el tabaco con PagueloFacil?
+        corta: "¿Acepta no cobrar el tabaco con nosotros?"
+        opciones:
+          - id: si_mayoria_permitida
+            texto: Sí, y lo permitido es la mayor parte de su negocio
+            corto: "Sí, el tabaco es lo de menos"
+            tope: condicionado
+            motivo: Se afilia solo la línea permitida, con carta compromiso de exclusión.
+            documentos: [carta_exclusion]
+            alternativas: [afiliar_linea_permitida]
+          - id: si_mayoria_tabaco
+            texto: Sí, pero el tabaco es lo principal
+            corto: "Sí, pero el tabaco es lo principal"
+            tope: comite
+            motivo: El tabaco es lo principal del negocio; el comité decide si la afiliación parcial es viable.
+            documentos: [carta_exclusion]
+          - id: "no"
+            texto: "No"
+            corto: "No"
+
+  - id: adultos
+    nombre: Contenido y servicios para adultos
+    nivel: no_aplica
+    origen: publica
+    por_que: >-
+      Los términos y condiciones de PagueloFacil excluyen el contenido para adultos. Las marcas de tarjeta lo tratan
+      como de alto riesgo.
+    palabras_clave: [adulto, adultos, xxx, porno*, erotic*, sex shop, sexshop, juguetes sexuales, juguete sexual,
+      webcam*, onlyfans, contenido exclusivo, "+18", 18+, escort*, acompanante*, prepago*, masajes eroticos,
+      striptease, stripper*, club nocturno, nightclub, cabaret*, swinger*, fetich*]
+    preguntas:
+      - id: adultos_que_vende
+        clave: true
+        texto: ¿Qué vende exactamente?
+        opciones:
+          - id: contenido
+            texto: Contenido para adultos (videos, fotos, webcam, suscripciones o plataformas +18)
+            corto: "🔞 Contenido +18"
+            nivel: no_aplica
+            motivo: El contenido para adultos está en la lista de actividades no permitidas.
+            alternativas: [afiliar_linea_permitida]
+          - id: servicios_sexuales
+            texto: Servicios sexuales o de acompañantes
+            corto: "Servicios sexuales"
+            nivel: no_aplica
+            motivo: Los servicios sexuales no se procesan en ningún caso.
+          - id: entretenimiento
+            texto: Entretenimiento para adultos en un local (club nocturno, cabaret)
+            corto: "🌙 Club nocturno"
+            nivel: comite
+            motivo: Entretenimiento para adultos en un local; por confirmar con Cumplimiento, va al comité.
+            alternativas: [verificacion_edad, expediente_comite]
+          - id: productos
+            texto: Productos de bienestar sexual o eróticos (sex shop)
+            corto: "Sex shop"
+            nivel: comite
+            motivo: Los productos para adultos no están claros en la lista pública; el comité decide (por confirmar).
+            alternativas: [verificacion_edad, expediente_comite]
+          - id: sin_adultos
+            texto: Nada para adultos (lencería o ropa íntima normal, salud, la palabra se usa en otro sentido)
+            corto: "🙅 Nada para adultos"
+            descarta: true
+            motivo: No vende contenido ni servicios para adultos; la palabra clave era un falso positivo.
+
+      - id: adultos_excluir
+        clave: true
+        mostrar_si: {adultos_que_vende: [productos, contenido]}
+        texto: ¿Vende además productos permitidos y acepta no cobrar lo de adultos con PagueloFacil?
+        corta: "¿Acepta no cobrar lo de adultos con nosotros?"
+        ayuda: Por ejemplo, una tienda de lencería que también vende algunos productos eróticos.
+        opciones:
+          - id: si_mayoria_permitida
+            texto: Sí, y lo permitido es la mayor parte de su negocio
+            corto: "Sí, es una parte pequeña"
+            tope: condicionado
+            motivo: Se afilia solo la línea permitida, con carta compromiso de exclusión.
+            documentos: [carta_exclusion]
+            alternativas: [afiliar_linea_permitida]
+          - id: "no"
+            texto: "No"
+            corto: "No"
+
+  - id: apuestas
+    nombre: Apuestas y juegos de azar
+    nivel: no_aplica
+    origen: publica
+    por_que: Los términos y condiciones de PagueloFacil excluyen las apuestas y los juegos de azar.
+    palabras_clave: [apuesta*, apostar, casino*, loteria*, lotto, rifa*, sorteo*, bingo*, tragamoneda*, slots, poker,
+      ruleta*, quiniela*, chance, chances, pronostico*, juegos de azar, parley, parlay, raspadit*]
+    alternativas: [expediente_comite]
+    preguntas:
+      - id: apuestas_que_vende
+        clave: true
+        texto: ¿Por qué paga el cliente?
+        opciones:
+          - id: apuestas
+            texto: Por apostar o jugar por dinero (casino, lotería, tragamonedas, póker, pronósticos pagados)
+            corto: "🎰 Apostar por dinero"
+            nivel: no_aplica
+            motivo: Las apuestas y los juegos de azar están en la lista de actividades no permitidas.
+          - id: rifa
+            texto: Por un boleto de rifa o sorteo (benéfico, de un producto o de una organización)
+            corto: "🎟️ Rifa o sorteo"
+            nivel: comite
+            motivo: Las rifas y sorteos necesitan permiso de la Junta de Control de Juegos; el comité decide.
+            documentos: [permiso_juegos]
+            alternativas: [tramitar_licencia, expediente_comite]
+          - id: promocion
+            texto: Por un producto, y participa gratis en un sorteo promocional
+            corto: "🎁 Promo con sorteo gratis"
+            nivel: condicionado
+            motivo: Se cobra el producto, no la participación; es una promoción comercial.
+            condiciones: [La participación en el sorteo no se cobra por separado.]
+            documentos: [permiso_juegos]
+          - id: habilidad
+            texto: Por inscribirse en un torneo o competencia de habilidad (deportes, e-sports, ajedrez)
+            corto: "🏆 Torneo de habilidad"
+            nivel: aplica
+            motivo: >-
+              Inscripción a una competencia de habilidad: es un evento, no un juego de azar (si el premio es dinero y
+              depende de la suerte, cambia a apuestas).
+            activa: [experiencias_eventos]
+          - id: sin_apuestas
+            texto: Nada de apuestas (la palabra se usa en otro sentido)
+            corto: "🙅 Nada de apuestas"
+            descarta: true
+            motivo: No hay apuestas ni juegos de azar; la palabra clave era un falso positivo.
+
+  - id: armas
+    nombre: Armas, municiones y pirotecnia
+    nivel: no_aplica
+    origen: publica
+    por_que: Los términos y condiciones de PagueloFacil excluyen las armas.
+    palabras_clave: [arma, armas, armeria*, municion*, pistola*, revolver*, rifle*, escopeta*, fusil*, balas,
+      airsoft, paintball, balin*, gas pimienta, taser*, paralizador*, explosivo*, polvora, pirotecni*,
+      fuegos artificiales, cuchillo tactico, cuchillos tacticos, navaja*, ballesta*, poligono de tiro, clases de tiro]
+    alternativas: [afiliar_linea_permitida]
+    preguntas:
+      - id: armas_que_vende
+        clave: true
+        texto: ¿Qué vende exactamente?
+        opciones:
+          - id: armas_fuego
+            texto: Armas de fuego, municiones, partes o accesorios para armas
+            corto: "Armas o municiones"
+            nivel: no_aplica
+            motivo: Las armas y municiones están en la lista de actividades no permitidas.
+          - id: defensa
+            texto: Armas blancas, de defensa personal o de aire (cuchillos tácticos, gas pimienta, paralizadores, ballestas, rifles de airsoft)
+            corto: "Defensa personal"
+            nivel: comite
+            motivo: Armas blancas o de defensa personal; no están claras en la lista pública, el comité decide (por confirmar).
+            alternativas: [afiliar_linea_permitida, expediente_comite]
+          - id: poligono
+            texto: Un polígono o clases de tiro con armas de fuego
+            corto: "🎯 Polígono de tiro"
+            nivel: comite
+            motivo: Servicio de formación con armas de fuego; el comité decide (por confirmar).
+            alternativas: [expediente_comite]
+          - id: recreativo
+            texto: Un campo de paintball o airsoft (cobra la actividad, no vende las armas)
+            corto: "🎨 Paintball o airsoft"
+            nivel: condicionado
+            motivo: Se cobra una actividad recreativa, no la venta de armas.
+            activa: [experiencias_eventos]
+          - id: pirotecnia
+            texto: Pirotecnia o fuegos artificiales
+            corto: "🎆 Pirotecnia"
+            nivel: comite
+            motivo: La pirotecnia no está clara en la lista pública; el comité decide (por confirmar).
+          - id: sin_armas
+            texto: Nada de armas (cuchillería de cocina, herramientas, la palabra se usa en otro sentido)
+            corto: "🙅 Nada de armas"
+            descarta: true
+            motivo: No vende armas; la palabra clave era un falso positivo.
+
+      - id: armas_excluir
+        clave: true
+        mostrar_si: {armas_que_vende: [armas_fuego, defensa, pirotecnia]}
+        texto: ¿Vende además productos permitidos y acepta no cobrar esa línea con PagueloFacil?
+        corta: "¿Acepta no cobrar esa línea con nosotros?"
+        ayuda: Por ejemplo, una tienda de caza y pesca que también vende algunas armas.
+        opciones:
+          - id: si_mayoria_permitida
+            texto: Sí, y lo permitido es la mayor parte de su negocio
+            corto: "Sí, es una parte pequeña"
+            tope: condicionado
+            motivo: Se afilia solo la línea permitida, con carta compromiso de exclusión.
+            documentos: [carta_exclusion]
+            alternativas: [afiliar_linea_permitida]
+          - id: "no"
+            texto: "No"
+            corto: "No"
+
+  - id: cripto
+    nombre: Criptomonedas como giro del negocio
+    nivel: no_aplica
+    origen: publica
+    por_que: >-
+      Los términos y condiciones de PagueloFacil excluyen las criptomonedas como giro del comercio. Aceptar cripto como
+      medio de pago es otra cosa: PagueloFacil lo ofrece con CriptoFácil.
+    palabras_clave: [cripto*, crypto*, bitcoin*, btc, ethereum, usdt, tether, binance, blockchain, nft, nfts,
+      token, tokens, mineria de cripto*, minar, staking, exchange]
+    preguntas:
+      - id: cripto_que_hace
+        clave: true
+        texto: ¿Qué hace el comercio con las criptomonedas?
+        opciones:
+          - id: exchange
+            texto: Compra, vende o intercambia criptomonedas (exchange, OTC, cajero cripto)
+            corto: "💱 Compra y vende cripto"
+            nivel: no_aplica
+            motivo: Las criptomonedas como giro del comercio están en la lista de actividades no permitidas.
+          - id: inversion
+            texto: Ofrece inversiones, minería, staking, tokens propios o NFT
+            corto: "📈 Inversión o NFT"
+            nivel: no_aplica
+            motivo: Inversión en cripto como giro del comercio; actividad no permitida y de alto riesgo de fraude.
+          - id: educacion
+            texto: Vende cursos, asesoría o comunidad sobre cripto o trading
+            corto: "🎓 Cursos de cripto"
+            nivel: comite
+            motivo: Formación sobre cripto o trading; el comité revisa que no prometa rendimientos (por confirmar).
+            activa: [productos_digitales]
+          - id: acepta_pago
+            texto: Vende productos o servicios normales y quiere ACEPTAR pagos en cripto
+            corto: "💳 Solo acepta pagos en cripto"
+            descarta: true
+            motivo: Aceptar cripto como medio de pago no es un comercio de criptomonedas.
+            alternativas: [criptofacil]
+          - id: otro
+            texto: La palabra se usa en otro sentido (por ejemplo, tokens de software)
+            corto: "🙅 Otro sentido"
+            descarta: true
+            motivo: No opera con criptomonedas; la palabra clave era un falso positivo.
+
+  - id: tarjetas_juego
+    nombre: Tarjetas de juego, de regalo y saldo de terceros
+    nivel: no_aplica
+    origen: publica
+    por_que: >-
+      Los términos y condiciones de PagueloFacil excluyen las tarjetas de juego como giro del comercio. Son productos
+      de valor almacenado muy usados para el fraude con tarjetas robadas.
+    palabras_clave: [gift card*, giftcard*, tarjeta de regalo, tarjetas de regalo, tarjetas de juego, recarga*,
+      diamantes, free fire, v-bucks, vbucks, robux, steam, psn, playstation store, xbox live, google play, itunes,
+      codigos digitales, top up, topup]
+    alternativas: [gift_cards_propias, afiliar_linea_permitida]
+    preguntas:
+      - id: tarjetas_que_vende
+        clave: true
+        texto: ¿Qué vende exactamente?
+        opciones:
+          - id: terceros
+            texto: Tarjetas, códigos, pines o saldo de terceros (Steam, PlayStation, Google Play, diamantes, recargas de juegos)
+            corto: "🎮 Tarjetas o saldo de terceros"
+            nivel: no_aplica
+            motivo: Las tarjetas de juego y el saldo de terceros están en la lista de actividades no permitidas.
+          - id: recargas_telefonia
+            texto: Recargas de telefonía o de servicios
+            corto: "📱 Recargas"
+            nivel: comite
+            motivo: Las recargas son valor almacenado con alto riesgo de fraude; el comité decide (por confirmar).
+            alternativas: [expediente_comite]
+          - id: cuentas_juego
+            texto: Cuentas, ítems o servicios dentro de juegos (cuentas con nivel, boosting)
+            corto: "Cuentas de juegos"
+            nivel: comite
+            motivo: Venta de cuentas o ítems de juegos; alto riesgo de fraude y de reclamos, el comité decide (por confirmar).
+          - id: propias
+            texto: Tarjetas de regalo propias, que solo se canjean en su negocio
+            corto: "🎁 Tarjetas de regalo propias"
+            descarta: true
+            motivo: Una tarjeta de regalo propia es parte de su venta normal.
+            alternativas: [gift_cards_propias]
+          - id: videojuegos
+            texto: Videojuegos físicos, consolas o accesorios
+            corto: "🕹️ Videojuegos o consolas"
+            descarta: true
+            motivo: Venta de productos al detalle; no son tarjetas ni saldo.
+          - id: otro
+            texto: La palabra se usa en otro sentido
+            corto: "🙅 Otro sentido"
+            descarta: true
+            motivo: No vende tarjetas ni saldo; la palabra clave era un falso positivo.
+
+      - id: tarjetas_excluir
+        clave: true
+        mostrar_si: {tarjetas_que_vende: [terceros]}
+        texto: ¿Vende además productos permitidos y acepta no cobrar las tarjetas ni el saldo con PagueloFacil?
+        corta: "¿Acepta no cobrar las tarjetas con nosotros?"
+        ayuda: Por ejemplo, una tienda de videojuegos que también vende tarjetas de PlayStation.
+        opciones:
+          - id: si_mayoria_permitida
+            texto: Sí, y lo permitido es la mayor parte de su negocio
+            corto: "Sí, es una parte pequeña"
+            tope: condicionado
+            motivo: Se afilia solo la línea permitida, con carta compromiso de exclusión.
+            documentos: [carta_exclusion]
+            alternativas: [afiliar_linea_permitida]
+          - id: "no"
+            texto: "No"
+            corto: "No"
+
+  # ───────────────────────────── Propuestas (por validar con Cumplimiento) ─────────────────────────────
+
+  - id: replicas
+    nombre: Réplicas, falsificaciones y reventa no autorizada
+    nivel: comite
+    origen: propuesta
+    por_que: >-
+      Las marcas de tarjeta prohíben procesar productos falsificados o que violan la propiedad intelectual. Vender
+      originales o productos sin marca de terceros sí aplica.
+    palabras_clave: [replica*, imitacion*, "1:1", aaa, triple a, clon*, tipo original, calidad original, copia*,
+      pirata*, pirateria, iptv, cuentas de streaming, cuentas premium, perfiles de netflix, netflix, spotify premium,
+      cuentas compartidas]
+    alternativas: [productos_originales, afiliar_linea_permitida]
+    preguntas:
+      - id: replicas_que_vende
+        clave: true
+        texto: ¿Qué vende exactamente?
+        opciones:
+          - id: replicas_marca
+            texto: Réplicas o imitaciones con marca o logo de terceros (AAA, 1:1)
+            corto: "Réplicas de marca"
+            nivel: no_aplica
+            motivo: Productos falsificados; violan la propiedad intelectual y las reglas de las marcas de tarjeta (propuesta).
+          - id: streaming
+            texto: Cuentas o perfiles de streaming, IPTV o licencias revendidas sin autorización
+            corto: "📺 Cuentas de streaming"
+            nivel: no_aplica
+            motivo: Reventa no autorizada de servicios digitales (propuesta).
+          - id: originales
+            texto: Productos originales de marca (importador, revendedor o distribuidor autorizado)
+            corto: "✅ Originales de marca"
+            nivel: condicionado
+            motivo: Reventa de marcas; pedir prueba de que son originales.
+            documentos: [autorizacion_marca]
+          - id: genericos
+            texto: Productos genéricos o "inspirados" sin marca ni logos de terceros
+            corto: "Genéricos sin marca"
+            descarta: true
+            motivo: Productos sin marca de terceros; no hay falsificación.
+          - id: otro
+            texto: La palabra se usa en otro sentido (fotocopias, copias de llaves, réplicas a escala)
+            corto: "🙅 Otro sentido"
+            descarta: true
+            motivo: No hay falsificación; la palabra clave era un falso positivo.
+
+      - id: replicas_excluir
+        clave: true
+        mostrar_si: {replicas_que_vende: [replicas_marca]}
+        texto: ¿Vende además productos originales o sin marca y acepta no cobrar las réplicas con PagueloFacil?
+        corta: "¿Acepta no cobrar las réplicas con nosotros?"
+        opciones:
+          - id: si_mayoria_permitida
+            texto: Sí, y lo permitido es la mayor parte de su negocio
+            corto: "Sí, es una parte pequeña"
+            tope: comite
+            motivo: Afiliación parcial de un comercio que vende réplicas; el comité decide.
+            documentos: [carta_exclusion, autorizacion_marca]
+            alternativas: [afiliar_linea_permitida, expediente_comite]
+          - id: "no"
+            texto: "No"
+            corto: "No"
+
+  - id: multinivel
+    nombre: Multinivel y esquemas de reclutamiento
+    nivel: comite
+    origen: propuesta
+    por_que: >-
+      La venta directa de productos es legítima. Un esquema donde el ingreso depende de reclutar personas o de
+      prometer rendimientos es piramidal y puede ser ilegal.
+    palabras_clave: [multinivel, mlm, network marketing, mercadeo en red, red de mercadeo, piramid*, ingresos pasivos,
+      oportunidad de negocio, libertad financiera, gana dinero, invita y gana, downline, upline, venta directa,
+      venta por catalogo]
+    alternativas: [venta_directa_producto]
+    preguntas:
+      - id: multinivel_ingresos
+        clave: true
+        texto: ¿De dónde vienen principalmente los ingresos?
+        opciones:
+          - id: productos
+            texto: De vender productos a consumidores finales (venta directa o por catálogo)
+            corto: "🛍️ De vender productos"
+            nivel: condicionado
+            motivo: Venta directa de productos; aplica si el ingreso viene de la venta y no del reclutamiento.
+            documentos: [descripcion_ampliada]
+            alternativas: [venta_directa_producto]
+          - id: reclutamiento
+            texto: De inscripciones, paquetes de entrada o reclutar personas
+            corto: "👥 De reclutar personas"
+            nivel: no_aplica
+            motivo: El ingreso depende de reclutar personas; es un esquema piramidal (propuesta).
+          - id: rendimientos
+            texto: De prometer rendimientos o ganancias por invertir
+            corto: "📈 De prometer ganancias"
+            nivel: no_aplica
+            motivo: Promesa de rendimientos; captación de dinero no autorizada (propuesta).
+          - id: otro
+            texto: No es una red ni un esquema (la palabra se usa en otro sentido)
+            corto: "🙅 No es una red"
+            descarta: true
+            motivo: No es un multinivel; la palabra clave era un falso positivo.
+
+  - id: facilitador_terceros
+    nombre: Cobros a nombre de terceros e intermediación
+    nivel: comite
+    origen: propuesta
+    por_que: >-
+      Si el comercio cobra por cuenta de otros, PagueloFacil no conoce a quien de verdad vende (riesgo de facilitación
+      de pagos o transaction laundering).
+    palabras_clave: [marketplace, agregador*, a nombre de terceros, por cuenta de terceros, intermediari*,
+      comisionista*, cobrar por otros, revendedor*, dropshipping, subcomercio*, pasarela de pago*, agencia de cobro*,
+      cobranza*]
+    alternativas: [afiliacion_individual_vendedores, expediente_comite]
+    preguntas:
+      - id: terceros_modelo
+        clave: true
+        texto: ¿Para quién es el dinero que cobra?
+        opciones:
+          - id: propio
+            texto: Para el propio comercio; vende sus productos o servicios (aunque use proveedores)
+            corto: "Para él mismo"
+            descarta: true
+            motivo: Cobra su propia venta; no es intermediación.
+          - id: dropshipping
+            texto: Para el propio comercio, pero el producto lo despacha un proveedor (dropshipping)
+            corto: "📦 Dropshipping"
+            nivel: condicionado
+            motivo: Dropshipping; el comercio responde por la entrega y hay riesgo de contracargo por demoras.
+            condiciones: [Tiempos de entrega, rastreo y política de devoluciones publicados.]
+            alternativas: [publicar_politicas]
+          - id: terceros
+            texto: Para otros vendedores o prestadores, y el comercio se queda con una comisión (marketplace, plataforma, agencia)
+            corto: "🏪 Para otros vendedores"
+            nivel: comite
+            motivo: Cobrar por cuenta de terceros convierte al comercio en un facilitador de pagos; el comité decide.
+            documentos: [contrato_vendedores]
+            alternativas: [afiliacion_individual_vendedores, expediente_comite]
+          - id: pasarela
+            texto: Quiere ofrecer el cobro con PagueloFacil a otros comercios (ser pasarela o subadquirente)
+            corto: "🔌 Quiere ser pasarela"
+            nivel: comite
+            motivo: Modelo de facilitador de pagos; requiere un acuerdo especial con Comercial y Cumplimiento.
+          - id: cobranza
+            texto: Cobra deudas o cuotas de terceros (agencia de cobros)
+            corto: "Cobranza de deudas"
+            nivel: comite
+            motivo: Cobranza por cuenta de terceros; el comité decide (por confirmar).
+            documentos: [contrato_vendedores]
+
+  - id: servicios_financieros
+    nombre: Servicios financieros
+    nivel: comite
+    origen: propuesta
+    por_que: Son actividades reguladas; el comercio necesita la licencia de su regulador.
+    palabras_clave: [prestamo*, creditos personales, financiamiento*, financiera*, casa de empeno, empeno*,
+      cambio de divisas, casa de cambio, remesa*, envio de dinero, envios de dinero, inversion*, invertir, forex,
+      trading, senales de trading, fondo de inversion, corredor de seguros, aseguradora*, poliza*, cooperativa*,
+      billetera digital, factoring]
+    alternativas: [expediente_comite]
+    preguntas:
+      - id: financiero_que_hace
+        clave: true
+        texto: ¿Qué servicio financiero cobra?
+        opciones:
+          - id: prestamos
+            texto: Presta dinero o cobra cuotas de su financiamiento (financiera, casa de empeño, cooperativa)
+            corto: "💵 Préstamos o empeño"
+            nivel: comite
+            motivo: Actividad financiera regulada; el comité valida la licencia.
+            documentos: [licencia_financiera]
+          - id: seguros
+            texto: Vende seguros como corredor o aseguradora
+            corto: "🛡️ Seguros"
+            nivel: condicionado
+            motivo: Seguros; aplica con la licencia de la Superintendencia de Seguros.
+            documentos: [licencia_financiera, idoneidad_profesional]
+          - id: inversiones
+            texto: Inversiones, trading, forex, fondos o promesas de rendimientos
+            corto: "📈 Inversiones o trading"
+            nivel: comite
+            motivo: Inversiones y trading; alto riesgo de fraude, el comité valida la licencia del regulador de valores.
+            documentos: [licencia_financiera]
+          - id: remesas
+            texto: Remesas, cambio de divisas, billeteras o envío de dinero
+            corto: "💸 Remesas o cambio"
+            nivel: comite
+            motivo: Transmisión de dinero; actividad regulada con alto riesgo de blanqueo, el comité decide.
+            documentos: [licencia_financiera, origen_fondos]
+          - id: financia_venta
+            texto: Vende sus propios productos a cuotas (financia su propia venta)
+            corto: "Vende a cuotas"
+            descarta: true
+            motivo: Financiar su propia venta no es una actividad financiera; es su venta normal.
+          - id: otro
+            texto: La palabra se usa en otro sentido (por ejemplo, "aceptamos financiamiento")
+            corto: "🙅 Otro sentido"
+            descarta: true
+            motivo: No presta servicios financieros; la palabra clave era un falso positivo.
+
+  - id: alto_valor
+    nombre: Bienes de alto valor (joyas, metales, inmuebles, vehículos)
+    nivel: condicionado
+    origen: propuesta
+    por_que: >-
+      Son actividades de mayor riesgo de blanqueo de capitales (sujetos obligados no financieros, Ley 23 de 2015;
+      verificar con Cumplimiento). Aplican con debida diligencia reforzada y límites a la medida.
+    palabras_clave: [joyeria*, joyas, oro, metales preciosos, piedras preciosas, relojes de lujo, rolex,
+      bienes raices, inmobiliari*, venta de autos, autos usados, venta de vehiculos, concesionari*, compra de oro,
+      compro oro, lingote*]
+    alternativas: [aumento_limite, limites_iniciales]
+    preguntas:
+      - id: alto_valor_que_vende
+        clave: true
+        texto: ¿Qué vende exactamente?
+        opciones:
+          - id: joyeria
+            texto: Joyería, relojes o artículos de lujo al detalle
+            corto: "💍 Joyería o lujo"
+            nivel: condicionado
+            motivo: Artículos de alto valor; debida diligencia reforzada y límites por transacción.
+            documentos: [origen_fondos]
+          - id: metales
+            texto: Compra o venta de oro, metales o piedras preciosas como inversión (incluye "compro oro")
+            corto: "🥇 Oro como inversión"
+            nivel: comite
+            motivo: Metales y piedras preciosas como inversión; mayor riesgo de blanqueo, el comité decide.
+            documentos: [origen_fondos, licencia_financiera]
+          - id: inmuebles_vehiculos
+            texto: Bienes raíces o vehículos (reservas, abonos o ventas)
+            corto: "🏠 Inmuebles o autos"
+            nivel: condicionado
+            motivo: Montos altos; límites a la medida y debida diligencia reforzada.
+            documentos: [origen_fondos]
+          - id: otro
+            texto: La palabra se usa en otro sentido (bisutería, accesorios económicos)
+            corto: "🙅 Otro sentido"
+            descarta: true
+            motivo: No vende bienes de alto valor; la palabra clave era un falso positivo.
+
+  - id: esoterismo_citas
+    nombre: Servicios esotéricos y de citas
+    nivel: comite
+    origen: propuesta
+    por_que: Las marcas de tarjeta los tratan como de alto riesgo por sus niveles de contracargos y reclamos.
+    palabras_clave: [tarot, astrolog*, horoscopo*, videncia, vidente*, psiquic*, brujeria, brujo*, amarre*, hechizo*,
+      santeria, limpias, lectura de cartas, carta astral, numerolog*, citas en linea, agencia matrimonial,
+      sitio de citas, dating]
+    alternativas: [publicar_politicas, limites_iniciales, expediente_comite]
+    preguntas:
+      - id: esoterismo_que_vende
+        clave: true
+        texto: ¿Qué vende exactamente?
+        opciones:
+          - id: consultas
+            texto: Consultas o trabajos esotéricos (tarot, videncia, amarres, trabajos espirituales)
+            corto: "🔮 Consultas esotéricas"
+            nivel: comite
+            motivo: Servicios esotéricos; alto nivel de contracargos y reclamos, el comité decide (por confirmar).
+          - id: citas
+            texto: Servicios de citas o búsqueda de pareja
+            corto: "💘 Citas o pareja"
+            nivel: comite
+            motivo: Servicios de citas; alto nivel de contracargos y reclamos, el comité decide (por confirmar).
+          - id: productos_talleres
+            texto: Productos o talleres de bienestar (velas, inciensos, cristales, meditación, astrología como entretenimiento)
+            corto: "🕯️ Productos o talleres"
+            descarta: true
+            motivo: Venta de productos o talleres; es comercio al detalle o educación.
+          - id: otro
+            texto: La palabra se usa en otro sentido
+            corto: "🙅 Otro sentido"
+            descarta: true
+            motivo: La palabra clave era un falso positivo.
+
+  - id: productos_digitales
+    nombre: Cursos, mentorías e infoproductos
+    nivel: condicionado
+    origen: propuesta
+    por_que: >-
+      Aplican, pero tienen más contracargos por "no recibí lo prometido". Las promesas de ingresos rápidos son una
+      señal de esquema engañoso.
+    palabras_clave: [infoproducto*, ebook*, e-book*, mentoria*, coaching, masterclass, webinar*, curso online,
+      cursos online, curso en linea, cursos en linea, membresia digital, comunidad privada, descargable*]
+    alternativas: [publicar_politicas]
+    preguntas:
+      - id: digitales_promesa
+        clave: true
+        texto: ¿El producto promete resultados económicos (ganar dinero, hacerse rico, ingresos rápidos)?
+        corta: "¿Promete ganar dinero?"
+        opciones:
+          - id: "no"
+            texto: No; enseña un tema o entrega contenido (idiomas, cocina, diseño, fitness, software)
+            corto: "No, enseña un tema"
+            nivel: aplica
+            motivo: Educación o contenido digital sin promesas de ingresos.
+          - id: si
+            texto: Sí; promete ingresos, rendimientos o "libertad financiera"
+            corto: "Sí, promete ingresos"
+            nivel: comite
+            motivo: Las promesas de ingresos tienen alto riesgo de reclamos y de esquemas engañosos; el comité decide.
+            alternativas: [expediente_comite]
+
+      - id: digitales_entrega
+        texto: ¿Cómo demuestra que el cliente recibió el producto?
+        corta: "¿Cómo prueba que el cliente lo recibió?"
+        opciones:
+          - id: plataforma
+            texto: Acceso con usuario en una plataforma que registra el uso
+            corto: "💻 Plataforma con usuario"
+          - id: envio
+            texto: Envío de archivos o enlaces por correo o WhatsApp
+            corto: "📩 Por correo o WhatsApp"
+            condiciones: [Guardar evidencia de entrega (correo, registro de descarga) para defender contracargos.]
+          - id: en_vivo
+            texto: Sesiones en vivo
+            corto: "🎥 Sesiones en vivo"
+            condiciones: [Guardar el registro de asistencia de las sesiones para defender contracargos.]
+
+  - id: salud
+    nombre: Salud, medicamentos y suplementos
+    nivel: condicionado
+    origen: propuesta
+    por_que: >-
+      Los servicios de salud y la venta de medicamentos o suplementos aplican con sus permisos sanitarios. Los productos
+      sin registro o de uso controlado son de alto riesgo.
+    palabras_clave: [farmacia*, medicamento*, receta*, suplemento*, vitamina*, proteina*, peptido*, esteroide*,
+      anabolic*, testosterona, sarms, cbd, cannabis, marihuana, canamo, kratom, bajar de peso, adelgaz*,
+      quemador de grasa, quemadores de grasa, sildenafil, viagra, botox, acido hialuronico, clinica*, consultorio*,
+      medico*, odontolog*, dentista*, cirugia*, laboratorio clinico]
+    alternativas: [tramitar_licencia]
+    preguntas:
+      - id: salud_que_vende
+        clave: true
+        texto: ¿Qué vende exactamente?
+        opciones:
+          - id: servicios
+            texto: Servicios de salud (consultas, odontología, terapias, laboratorio, procedimientos)
+            corto: "🩺 Servicios de salud"
+            nivel: condicionado
+            motivo: Servicios de salud; aplica con la idoneidad del profesional o el permiso del establecimiento.
+            documentos: [idoneidad_profesional]
+          - id: farmacia
+            texto: Medicamentos en una farmacia (local o a domicilio)
+            corto: "💊 Farmacia"
+            nivel: condicionado
+            motivo: Farmacia; aplica con licencia de operación y regente. Los medicamentos con receta exigen validarla antes de vender.
+            documentos: [licencia_farmacia]
+          - id: suplementos
+            texto: Suplementos, vitaminas, proteínas o productos naturales con registro sanitario
+            corto: "🥤 Suplementos con registro"
+            nivel: condicionado
+            motivo: Suplementos; aplica con registro sanitario y sin promesas médicas.
+            documentos: [registro_sanitario]
+          - id: sin_registro
+            texto: Productos sin registro sanitario, péptidos, hormonas, esteroides o productos para bajar de peso importados
+            corto: "Productos sin registro"
+            nivel: comite
+            motivo: Productos de salud sin registro sanitario o de uso controlado; el comité decide (posible prohibición, por confirmar).
+            documentos: [registro_sanitario]
+            alternativas: [tramitar_licencia, afiliar_linea_permitida]
+          - id: cannabis
+            texto: Cannabis, CBD o derivados
+            corto: "🌿 Cannabis o CBD"
+            nivel: comite
+            motivo: El cannabis medicinal solo se vende con licencia (Ley 242 de 2021; verificar con Legal); el comité decide.
+            documentos: [licencia_farmacia]
+          - id: controlados
+            texto: Sustancias controladas, o medicamentos que requieren receta vendidos sin ella
+            corto: "Sustancias controladas"
+            nivel: no_aplica
+            motivo: Venta de sustancias controladas sin control sanitario (propuesta).
+          - id: estetica
+            texto: Belleza y estética no médica (spa, uñas, peluquería, masajes)
+            corto: "💅 Belleza y spa"
+            descarta: true
+            motivo: Belleza y estética; actividad permitida.
+
+  - id: donaciones
+    nombre: Donaciones y recaudación de fondos
+    nivel: condicionado
+    origen: propuesta
+    por_que: >-
+      Aplican cuando hay una organización verificable detrás. Las colectas para personas particulares son difíciles de
+      verificar.
+    palabras_clave: [donacion*, donativo*, ong, fundacion*, sin fines de lucro, benefic*, caridad, iglesia*,
+      ofrenda*, diezmo*, colecta*, crowdfunding, causa social, recaudacion de fondos, gofundme]
+    alternativas: [plan_personalizado]
+    preguntas:
+      - id: donaciones_quien
+        clave: true
+        texto: ¿Quién recibe el dinero?
+        opciones:
+          - id: organizacion
+            texto: Una organización constituida (fundación, asociación, iglesia)
+            corto: "🏛️ Una organización"
+            nivel: condicionado
+            motivo: Organización sin fines de lucro; aplica con su personería jurídica y puede optar por el Plan Personalizado.
+            documentos: [personeria_ong, registro_publico]
+            alternativas: [plan_personalizado]
+          - id: persona
+            texto: Una persona o causa particular (colecta para un tratamiento, un viaje, etc.)
+            corto: "🙋 Una persona"
+            nivel: comite
+            motivo: Colectas para personas particulares; es difícil verificar el destino de los fondos, el comité decide.
+            alternativas: [expediente_comite]
+          - id: politica
+            texto: Un partido, candidato o campaña política
+            corto: "🗳️ Una campaña política"
+            nivel: comite
+            motivo: Donaciones políticas; tienen regulación electoral, el comité decide (por confirmar).
+          - id: vende
+            texto: No son donaciones; vende productos o servicios (aunque apoye una causa)
+            corto: "🛍️ No, vende algo"
+            descarta: true
+            motivo: Es una venta normal, no una recaudación.
+
+  # ───────────────────────────── Actividades que aplican (destinos de reclasificación) ─────────────────────────────
+
+  - id: experiencias_eventos
+    nombre: Experiencias, tours y eventos
+    nivel: aplica
+    origen: propuesta
+    por_que: >-
+      Turismo y entretenimiento aplican. El riesgo está en la entrega futura (el evento no ocurre o se cancela) y en
+      quién presta el servicio.
+    palabras_clave: [tour, tours, experiencias, experiencia gastronomica, experiencia turistica, excursion*, eventos,
+      concierto*, festival*, boleteria*, venta de entradas, entradas para, tickets, city tour, aventura*, senderismo,
+      pub crawl, bar hopping]
+    alternativas: [publicar_politicas, anticipo_menor]
+    preguntas:
+      - id: eventos_quien_presta
+        clave: true
+        texto: ¿Quién presta el servicio o hace el evento?
+        opciones:
+          - id: propio
+            texto: El mismo comercio (su guía, su equipo, su evento)
+            corto: "Él mismo"
+          - id: aliados
+            texto: Proveedores o locales aliados, y el comercio coordina y cobra todo
+            corto: "🤝 Con aliados"
+            nivel: condicionado
+            motivo: El comercio cobra el paquete completo y responde ante el cliente por los servicios de sus aliados.
+            condiciones: [Acuerdo con los aliados; el comercio responde ante el cliente por el servicio completo.]
+            documentos: [acuerdo_locales_aliados]
+          - id: reventa
+            texto: Revende boletos o entradas de eventos de otros
+            corto: "🎫 Revende boletos"
+            nivel: comite
+            motivo: Reventa de boletos de terceros; riesgo de fraude y de reclamos, el comité decide (por confirmar).
+            alternativas: [expediente_comite]
+
+      - id: eventos_cancelacion
+        texto: ¿Tiene política de cancelación o reprogramación (lluvia, cupo mínimo, fuerza mayor)?
+        corta: "¿Tiene política de cancelación?"
+        opciones:
+          - id: si
+            texto: Sí, publicada
+            corto: "Sí"
+          - id: "no"
+            texto: "No"
+            corto: "No"
+            condiciones: [Publicar la política de cancelación y reprogramación antes de cobrar.]
+            alternativas: [publicar_politicas]
+
+  - id: viajes
+    nombre: Agencias de viaje y hospedaje
+    nivel: aplica
+    origen: propuesta
+    por_que: >-
+      Aplican. Las agencias que revenden servicios de terceros (aerolíneas, hoteles) responden ante el cliente si el
+      proveedor falla.
+    palabras_clave: [agencia de viaje*, agencias de viaje*, boletos aereos, pasajes, vuelos, paquete turistico,
+      paquetes turisticos, hotel*, hostal*, hospedaje*, alojamiento*, airbnb, alquiler vacacional, crucero*, resort*]
+    alternativas: [anticipo_menor]
+    preguntas:
+      - id: viajes_quien_presta
+        clave: true
+        texto: ¿El servicio es propio o de terceros?
+        opciones:
+          - id: propio
+            texto: Propio (su hotel, su hostal, su alquiler)
+            corto: "🏨 Propio"
+          - id: intermediario
+            texto: Revende servicios de terceros (agencia de boletos, hoteles o paquetes)
+            corto: "✈️ De terceros (agencia)"
+            nivel: condicionado
+            motivo: Agencia de viajes; responde ante el cliente por servicios de terceros.
+            condiciones: [Comprobantes de reserva con los proveedores y política de cancelación publicada.]
+            documentos: [registro_turismo]
+
+  - id: restaurantes
+    nombre: Restaurantes y comida
+    nivel: aplica
+    origen: propuesta
+    por_que: Actividad permitida.
+    palabras_clave: [restaurante*, comida*, cafeteria*, cafe, panaderia*, reposteria*, food truck, catering,
+      fonda*, pizzeria*]
+    preguntas: []

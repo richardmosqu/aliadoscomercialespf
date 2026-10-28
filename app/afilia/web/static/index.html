@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f8ef">
+  <title>Ali · Aliados PagueloFacil</title>
+  <link rel="icon" href="/static/logo-icono.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/static/estilos.css">
+</head>
+<body data-fase="inicio" data-nivel="reposo">
+  <div class="aura" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <section class="acceso" id="acceso" hidden>
+    <div class="orbe orbe-acceso" aria-hidden="true"><span class="halo"></span><span class="nucleo"></span><span class="brillo"></span></div>
+    <h1>Hola, soy Ali</h1>
+    <p>Te ayudo a saber si un comercio puede ser aliado de PagueloFacil.</p>
+    <form class="acceso-form" id="form-acceso">
+      <input id="correo" type="email" autocomplete="email" maxlength="254" placeholder="tu.correo@paguelofacil.com" aria-label="Correo de la empresa" required>
+      <input id="clave-acceso" type="password" autocomplete="current-password" maxlength="200" placeholder="Clave de acceso" aria-label="Clave de acceso" required>
+      <button type="submit" class="boton-principal">Entrar</button>
+    </form>
+    <p class="acceso-error" id="acceso-error" role="alert" hidden></p>
+  </section>
+
+  <div class="app" id="app" hidden>
+    <header class="arriba">
+      <div class="marca">
+        <img src="/static/logo-paguelofacil.svg" alt="PagueloFacil" width="148" height="32">
+        <span>Aliados</span>
+      </div>
+      <nav class="iconos" aria-label="Opciones">
+        <button type="button" class="icono" id="btn-nuevo" title="Nuevo caso" aria-label="Nuevo caso">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button type="button" class="icono" id="btn-historial" title="Casos guardados" aria-label="Casos guardados">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+        </button>
+        <button type="button" class="icono" id="btn-politica" title="Lo que sabe Ali" aria-label="Lo que sabe Ali">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h9.5L19 9v10.5H5z"/><path d="M14 4.5V9h5M8.5 13h7M8.5 16.5h5"/></svg>
+        </button>
+        <button type="button" class="icono" id="btn-salir" title="Salir" aria-label="Salir" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5H6v14h8M10 12h10M17 8.5l3.5 3.5-3.5 3.5"/></svg>
+        </button>
+      </nav>
+    </header>
+
+    <div class="velo" aria-hidden="true"></div>
+    <main class="escena">
+      <div class="escenario">
+        <div class="orbe" id="orbe" aria-hidden="true"><span class="halo"></span><span class="nucleo"></span><span class="brillo"></span></div>
+        <button type="button" class="pildora" id="pildora" hidden></button>
+      </div>
+      <div class="conversacion" id="conversacion" aria-live="polite"></div>
+    </main>
+
+    <form class="compositor" id="compositor" autocomplete="off">
+      <textarea id="entrada" rows="1" maxlength="4000" placeholder="Escribe qué vende el comercio…" aria-label="Mensaje para Ali"></textarea>
+      <button type="submit" class="enviar" aria-label="Enviar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg>
+      </button>
+    </form>
+  </div>
+
+  <div class="hoja" id="hoja" hidden>
+    <div class="hoja-panel" role="dialog" aria-modal="true" aria-labelledby="hoja-titulo">
+      <div class="hoja-cabecera">
+        <h2 id="hoja-titulo"></h2>
+        <button type="button" class="icono" id="hoja-cerrar" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="hoja-cuerpo" id="hoja-cuerpo"></div>
+    </div>
+  </div>
+
+  <div class="aviso" id="aviso" role="status" hidden></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

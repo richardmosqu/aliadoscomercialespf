@@ -1,0 +1,117 @@
+# Documentos que el evaluador puede pedirle al comercio.
+#
+# Cada categoría, pregunta o respuesta de la política nombra estos documentos por su id.
+# - por_confirmar: true = propuesta (nombre del permiso, entidad o requisito por validar con Cumplimiento y Legal).
+#   false = ya está en los guiones o formularios internos de PagueloFacil (base de conocimiento de CS Ai).
+version: "2026-10-28"
+
+documentos:
+  - id: cedula
+    nombre: Cédula (nacional) o pasaporte (extranjero) del titular o representante legal
+    detalle: Se valida en la plataforma, en Mi empresa › Validación de identidad.
+    por_confirmar: false
+
+  - id: aviso_operacion
+    nombre: Aviso de Operación
+    detalle: Acredita la actividad comercial. Si no lo tiene, una descripción breve de qué vende y cómo funciona el negocio.
+    por_confirmar: false
+
+  - id: ruc_dv
+    nombre: RUC y dígito verificador (DV)
+    detalle: Necesarios para una cuenta comercial. Se obtienen ante la DGI con el Aviso de Operación.
+    por_confirmar: false
+
+  - id: registro_publico
+    nombre: Certificado del Registro Público (persona jurídica)
+    detalle: Existencia de la sociedad o fundación, directores y representante legal.
+    por_confirmar: false
+
+  - id: formulario_debida_diligencia
+    nombre: Formulario en línea de debida diligencia ("Conoce a tu Cliente")
+    detalle: "Se llena desde el enlace, no se descarga: https://eform.pandadoc.com/?eform=8f854867-bd02-4a6c-970f-1c9eeeb239b8"
+    por_confirmar: false
+
+  - id: evaluacion_debida_diligencia
+    nombre: Documento "Evaluación de Debida Diligencia Comercial" en PDF, con el logo del comercio
+    detalle: Operación, clientes, uso de PagueloFacil, perfil transaccional, esquema de pagos, medios de pago, promoción y página web. Es la base del expediente para el comité.
+    por_confirmar: false
+
+  - id: descripcion_ampliada
+    nombre: Descripción ampliada de la actividad (2 o 3 líneas más)
+    detalle: Qué vende, a quién, cómo entrega y qué recibe el cliente exactamente cuando paga.
+    por_confirmar: false
+
+  - id: politicas_web
+    nombre: Enlaces a términos y condiciones, política de devoluciones o cancelación y contacto visible
+    detalle: Lo básico que revisa la evaluación de comercio, junto con el certificado SSL del sitio.
+    por_confirmar: false
+
+  - id: licencia_alcohol
+    nombre: Permiso o licencia vigente para la venta o expendio de bebidas alcohólicas
+    detalle: Del local que vende o sirve el alcohol (el propio comercio o el local aliado).
+    por_confirmar: true
+
+  - id: acuerdo_locales_aliados
+    nombre: Acuerdo o carta con los locales aliados
+    detalle: Muestra qué incluye el servicio y quién vende y cobra los productos restringidos (por ejemplo, las bebidas).
+    por_confirmar: true
+
+  - id: registro_turismo
+    nombre: Registro o licencia de turismo (agencia de viajes u operador de turismo)
+    detalle: Ante la Autoridad de Turismo de Panamá, si la actividad lo requiere.
+    por_confirmar: true
+
+  - id: licencia_farmacia
+    nombre: Licencia de operación de farmacia y regente farmacéutico
+    detalle: Ante la Dirección Nacional de Farmacia y Drogas (MINSA).
+    por_confirmar: true
+
+  - id: registro_sanitario
+    nombre: Registro sanitario de los productos
+    detalle: Suplementos, cosméticos, productos naturales o alimentos procesados que lo requieran.
+    por_confirmar: true
+
+  - id: idoneidad_profesional
+    nombre: Idoneidad o certificado profesional
+    detalle: Médicos, odontólogos, psicólogos, abogados, corredores y otras profesiones reguladas.
+    por_confirmar: true
+
+  - id: permiso_juegos
+    nombre: Permiso de la Junta de Control de Juegos
+    detalle: Rifas, sorteos y promociones con premio.
+    por_confirmar: true
+
+  - id: licencia_financiera
+    nombre: Licencia o registro de la actividad financiera ante el regulador que corresponda
+    detalle: Superintendencia de Bancos, Superintendencia del Mercado de Valores, Superintendencia de Seguros o MICI (empresas financieras y casas de empeño), según la actividad.
+    por_confirmar: true
+
+  - id: personeria_ong
+    nombre: Personería jurídica de la organización sin fines de lucro
+    detalle: Y, si aplica, su registro para recibir donaciones.
+    por_confirmar: true
+
+  - id: autorizacion_marca
+    nombre: Factura de compra o carta de distribuidor autorizado de las marcas que vende
+    detalle: Demuestra que los productos de marca son originales.
+    por_confirmar: true
+
+  - id: carta_exclusion
+    nombre: Carta compromiso de exclusión
+    detalle: El comercio se compromete por escrito a no cobrar con PagueloFacil la línea de productos no permitida y a no mostrarla en el checkout que usa PagueloFacil.
+    por_confirmar: true
+
+  - id: origen_fondos
+    nombre: Declaración de origen de fondos y beneficiarios finales
+    detalle: Debida diligencia reforzada para actividades de alto valor o de mayor riesgo de blanqueo de capitales.
+    por_confirmar: true
+
+  - id: contrato_vendedores
+    nombre: Contrato con los vendedores o proveedores por los que cobra
+    detalle: Y la lista de vendedores con su identificación, cuando el comercio cobra a nombre de terceros.
+    por_confirmar: true
+
+  - id: carta_autorizacion_vpos
+    nombre: Carta de autorización firmada por el tarjetahabiente (vPOS)
+    detalle: Una por cada transacción sin tarjeta presente. Sin ella, el comercio pierde el contracargo.
+    por_confirmar: false

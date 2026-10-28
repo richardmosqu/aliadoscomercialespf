@@ -1,0 +1,149 @@
+# Alternativas: caminos para que un comercio SÍ se pueda afiliar (o afiliar una parte de su negocio).
+#
+# Regla de oro: una alternativa cambia cómo opera el negocio de verdad, nunca solo cómo se describe.
+# Disfrazar una actividad no permitida bajo otra descripción (transaction laundering) es causa de cierre
+# y pone en riesgo a PagueloFacil ante las marcas de tarjeta.
+#
+# - por_confirmar: true = propuesta para que Cumplimiento la valide; false = ya se usa hoy (guiones de CS).
+version: "2026-10-28"
+
+alternativas:
+  - id: cobrar_solo_servicio
+    titulo: Cobrar con PagueloFacil solo el servicio
+    detalle: >-
+      El comercio cobra la experiencia, la guía, el transporte, la entrada o la clase. Los productos restringidos
+      (por ejemplo, las bebidas) los vende y cobra el local que tiene la licencia, con su propio medio de pago.
+      La descripción del cobro debe reflejar el servicio que de verdad se presta.
+    por_confirmar: true
+
+  - id: afiliar_linea_permitida
+    titulo: Afiliar solo la línea de negocio permitida
+    detalle: >-
+      Si el comercio vende productos permitidos y no permitidos, se afilia solo para los permitidos. Firma la carta
+      compromiso de exclusión y la línea no permitida no aparece en el checkout ni en los enlaces de PagueloFacil.
+    por_confirmar: true
+
+  - id: enlace_mientras_comite
+    titulo: Empezar con enlace de pago mientras el comité evalúa
+    detalle: >-
+      La afiliación no tiene que esperar al servicio que pasa por comité (recurrencia, Wix): el comercio puede
+      cobrar con enlace de pago desde el primer día.
+    por_confirmar: false
+
+  - id: cuenta_personal
+    titulo: Iniciar como cuenta personal
+    detalle: >-
+      Si no tiene RUC ni DV, puede operar como cuenta personal con los límites iniciales. Las cuentas personales
+      no permiten integraciones con tiendas en línea (Shopify y otras plataformas de e-commerce).
+    por_confirmar: false
+
+  - id: formalizar_negocio
+    titulo: Gestionar la documentación para una cuenta comercial
+    detalle: >-
+      Tramitar el Aviso de Operación y el RUC con DV ante la DGI para operar como cuenta comercial, con acceso
+      a integraciones de e-commerce y límites más altos.
+    por_confirmar: false
+
+  - id: limites_iniciales
+    titulo: Afiliar con los límites iniciales y revisar con historial
+    detalle: >-
+      Activar con los límites orientativos (persona natural $500 al mes y $100 por transacción; persona jurídica
+      $1,000 al mes y $100 por transacción) y que el comercio pida el aumento en Mi empresa cuando tenga historial.
+      Cumplimiento fija los límites de cada comercio.
+    por_confirmar: false
+
+  - id: aumento_limite
+    titulo: Pedir el aumento de límite desde el inicio
+    detalle: >-
+      Si el ticket o el volumen superan los límites iniciales, el comercio llena el formulario "Conoce a tu Cliente"
+      y amplía la descripción de su actividad en 2 o 3 líneas. Cumplimiento revisa y define el límite.
+    por_confirmar: false
+
+  - id: plan_personalizado
+    titulo: Ofrecer el Plan Personalizado
+    detalle: >-
+      Para alto volumen, ONG y gobierno existe una tarifa a la medida. Conviene pasar el caso a Comercial.
+    por_confirmar: false
+
+  - id: reserva_riesgo
+    titulo: Afiliar con reserva
+    detalle: >-
+      Los términos y condiciones permiten retener una reserva de 5 a 10% en operaciones de alto riesgo. Sirve para
+      aceptar comercios con entrega futura o con más riesgo de contracargos, en vez de rechazarlos.
+    por_confirmar: false
+
+  - id: anticipo_menor
+    titulo: Cobrar un anticipo y el saldo cerca de la fecha
+    detalle: >-
+      Si el servicio se presta dentro de mucho tiempo (eventos, viajes, preventas), cobrar un depósito al reservar y
+      el saldo cerca de la fecha baja el riesgo de contracargo por servicio no prestado.
+    por_confirmar: true
+
+  - id: publicar_politicas
+    titulo: Publicar las políticas mínimas en su sitio o redes
+    detalle: >-
+      Términos y condiciones, política de devoluciones o cancelación, contacto visible y certificado SSL. Con eso el
+      comercio defiende mejor sus contracargos y la evaluación mejora.
+    por_confirmar: false
+
+  - id: verificacion_edad
+    titulo: Verificar la mayoría de edad
+    detalle: >-
+      Pedir y validar la edad (18 años o más) al reservar y al prestar el servicio, y dejarlo escrito en sus términos.
+    por_confirmar: true
+
+  - id: tramitar_licencia
+    titulo: Afiliar cuando presente la licencia o el permiso
+    detalle: >-
+      Si la actividad necesita un permiso que el comercio todavía no tiene, dejar la solicitud abierta y afiliar al
+      recibirlo. Si el trámite está en curso, el comité puede evaluar con la constancia de trámite.
+    por_confirmar: true
+
+  - id: afiliacion_individual_vendedores
+    titulo: Que cada vendedor se afilie con su propia cuenta
+    detalle: >-
+      Si el comercio cobra a nombre de otros (marketplace, agencia, plataforma), lo más seguro es que cada vendedor
+      tenga su cuenta en PagueloFacil. Si el comercio quiere cobrar por todos, va a comité con el contrato y la lista
+      de vendedores.
+    por_confirmar: true
+
+  - id: criptofacil
+    titulo: Aceptar cripto como medio de pago con CriptoFácil
+    detalle: >-
+      Si el comercio vende productos o servicios permitidos y solo quiere recibir pagos en cripto, no es un comercio
+      de criptomonedas: puede usar CriptoFácil.
+    por_confirmar: true
+
+  - id: gift_cards_propias
+    titulo: Vender solo tarjetas de regalo propias
+    detalle: >-
+      Las tarjetas de regalo que solo se canjean en el propio negocio son parte de su venta normal. Lo que no se
+      procesa es la reventa de tarjetas, códigos o saldo de terceros.
+    por_confirmar: true
+
+  - id: productos_originales
+    titulo: Vender solo productos originales o sin marca de terceros
+    detalle: >-
+      Con factura del proveedor o carta de distribuidor autorizado, o productos genéricos sin logos de otras marcas.
+    por_confirmar: true
+
+  - id: venta_directa_producto
+    titulo: Demostrar que el ingreso viene de vender productos
+    detalle: >-
+      En venta directa o por catálogo, el comercio muestra que sus clientes compran productos para consumo y que el
+      ingreso no depende de reclutar personas.
+    por_confirmar: true
+
+  - id: expediente_comite
+    titulo: Llevar el caso al comité con el expediente completo
+    detalle: >-
+      Formulario en línea, documento de Evaluación de Debida Diligencia Comercial en PDF, documentos del negocio y el
+      resumen de este evaluador. Un expediente completo acelera la decisión.
+    por_confirmar: false
+
+  - id: carta_vpos
+    titulo: Usar vPOS con carta de autorización
+    detalle: >-
+      Para cobrar sin tarjeta presente, el comercio guarda una carta de autorización firmada por cada transacción.
+      Si prefiere evitarlo, el enlace de pago deja que el cliente pague por su cuenta.
+    por_confirmar: false

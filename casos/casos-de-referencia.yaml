@@ -1,0 +1,271 @@
+# Casos de referencia: decisiones que el evaluador debe seguir dando igual.
+#
+# Cada vez que el equipo resuelva un caso difícil ("¿aplica o no?"), se agrega aquí ANONIMIZADO (sin nombres reales,
+# cédulas, RUC ni datos de contacto) con la decisión que tomó Cumplimiento. Los tests (app/tests/test_casos.py)
+# verifican que el evaluador llegue a la misma decisión; si alguien cambia la política y un caso deja de cumplirse,
+# el cambio se revisa antes de publicarlo.
+#
+# esperado:
+#   nivel: aplica | condicionado | comite | no_aplica
+#   estado: completo | preliminar (opcional)
+#   activas: categorías que deben quedar activas (opcional)
+#   descartadas: categorías que deben quedar descartadas (opcional)
+#   alternativas: alternativas que deben aparecer (opcional)
+#   documentos: documentos que deben pedirse (opcional)
+#   servicios_comite: true si algún servicio debe pasar por comité (opcional)
+
+perfil_basico: &perfil
+  g_tipo: juridica
+  g_canal: [redes]
+  g_politicas: completo
+  g_entrega: inmediata
+  g_cobra_para: propio
+  g_listas: limpio
+  g_productos: [enlace]
+
+casos:
+  - id: tour-de-bares
+    nota: >-
+      Caso real (2026). Se rechazó por "venta de licor"; después de investigar, el comercio vendía tours por bares.
+      El evaluador debe preguntar qué recibe el cliente antes de concluir.
+    comercio:
+      nombre: Comercio de tours (anonimizado)
+      actividad: Venta de licor
+      descripcion: Vendemos experiencias de tour por bares del Casco Antiguo con licor incluido
+    respuestas:
+      <<: *perfil
+      alcohol_que_paga: experiencia
+      alcohol_peso: menos_mitad
+      alcohol_quien_vende: local_aliado
+      alcohol_edad: si
+      eventos_quien_presta: propio
+      eventos_cancelacion: si
+    esperado:
+      nivel: condicionado
+      estado: completo
+      activas: [alcohol, experiencias_eventos]
+      alternativas: [cobrar_solo_servicio]
+      documentos: [acuerdo_locales_aliados]
+
+  - id: tour-de-bares-sin-aclarar
+    nota: Sin responder las preguntas, el evaluador NO concluye; muestra un resultado preliminar y la pregunta clave.
+    comercio:
+      actividad: Venta de licor
+      descripcion: Experiencias de tour por bares
+    respuestas: {}
+    esperado:
+      nivel: no_aplica
+      estado: preliminar
+
+  - id: licoreria-delivery
+    comercio:
+      actividad: Licorería con entrega a domicilio
+      descripcion: Vendemos cervezas, ron y whisky por WhatsApp con delivery
+    respuestas:
+      <<: *perfil
+      alcohol_que_paga: venta_directa
+      alcohol_excluir: "no"
+    esperado:
+      nivel: no_aplica
+      estado: completo
+      alternativas: [afiliar_linea_permitida]
+
+  - id: minisuper-con-licor
+    nota: Vende comestibles y también licor; acepta no cobrar el licor con PagueloFacil.
+    comercio:
+      actividad: Minisúper
+      descripcion: Abarrotes, productos de limpieza, cervezas y licores
+    respuestas:
+      <<: *perfil
+      alcohol_que_paga: venta_directa
+      alcohol_excluir: si_mayoria_permitida
+    esperado:
+      nivel: condicionado
+      documentos: [carta_exclusion]
+
+  - id: bar-donde-lo-principal-es-el-licor
+    comercio:
+      actividad: Bar
+      descripcion: Bar con música en vivo, cócteles y cervezas artesanales
+    respuestas:
+      <<: *perfil
+      alcohol_que_paga: consumo_local
+      alcohol_peso: mas_mitad
+      alcohol_quien_vende: propio_con_licencia
+      alcohol_edad: si
+    esperado:
+      nivel: comite
+      documentos: [licencia_alcohol, formulario_debida_diligencia]
+
+  - id: alcohol-en-gel
+    nota: Falso positivo de la palabra "alcohol".
+    comercio:
+      actividad: Distribuidora de productos de limpieza
+      descripcion: Alcohol en gel, desinfectantes y jabones
+    respuestas:
+      <<: *perfil
+      alcohol_que_paga: sin_alcohol
+    esperado:
+      nivel: aplica
+      descartadas: [alcohol]
+
+  - id: tienda-de-vapes
+    comercio:
+      actividad: Venta de vapeadores
+      descripcion: Vapes desechables y líquidos
+    respuestas:
+      <<: *perfil
+      tabaco_que_vende: vapeadores
+    esperado:
+      nivel: no_aplica
+
+  - id: tienda-que-acepta-cripto
+    comercio:
+      actividad: Tienda de electrónica
+      descripcion: Vendemos celulares y accesorios; queremos aceptar pagos con cripto (USDT)
+    respuestas:
+      <<: *perfil
+      cripto_que_hace: acepta_pago
+    esperado:
+      nivel: aplica
+      descartadas: [cripto]
+      alternativas: [criptofacil]
+
+  - id: rifa-benefica
+    comercio:
+      actividad: Fundación
+      descripcion: Rifa benéfica para recaudar fondos para un comedor infantil
+    respuestas:
+      <<: *perfil
+      apuestas_que_vende: rifa
+      donaciones_quien: organizacion
+    esperado:
+      nivel: comite
+      documentos: [permiso_juegos, personeria_ong]
+
+  - id: marketplace-de-artesanos
+    comercio:
+      actividad: Marketplace
+      descripcion: Plataforma donde artesanos venden sus productos; cobramos una comisión
+    respuestas:
+      <<: *perfil
+      g_cobra_para: terceros
+      terceros_modelo: terceros
+    esperado:
+      nivel: comite
+      alternativas: [afiliacion_individual_vendedores]
+      documentos: [contrato_vendedores]
+
+  - id: agencia-de-viajes-con-preventa
+    comercio:
+      actividad: Agencia de viajes
+      descripcion: Paquetes turísticos y boletos aéreos para temporada alta
+    respuestas:
+      <<: *perfil
+      g_entrega: futura
+      viajes_quien_presta: intermediario
+    esperado:
+      nivel: condicionado
+      documentos: [registro_turismo]
+      alternativas: [anticipo_menor]
+
+  - id: gimnasio-con-recurrencia
+    nota: La recurrencia pasa por comité, pero no frena la afiliación.
+    comercio:
+      actividad: Gimnasio
+      descripcion: Membresías mensuales de gimnasio
+    respuestas:
+      <<: *perfil
+      g_productos: [enlace, recurrencia]
+    esperado:
+      nivel: aplica
+      servicios_comite: true
+      alternativas: [enlace_mientras_comite]
+
+  - id: persona-natural-con-shopify
+    comercio:
+      actividad: Venta de ropa
+      descripcion: Tienda de ropa en Shopify
+    respuestas:
+      <<: *perfil
+      g_tipo: natural
+      g_canal: [tienda_online]
+      g_productos: [integracion]
+    esperado:
+      nivel: aplica
+      alternativas: [formalizar_negocio]
+
+  - id: coincidencia-en-listas
+    comercio:
+      actividad: Tienda de ropa
+      descripcion: Ropa y accesorios
+    respuestas:
+      <<: *perfil
+      g_listas: confirmada
+    esperado:
+      nivel: no_aplica
+
+  - id: tienda-de-replicas
+    comercio:
+      actividad: Venta de zapatillas
+      descripcion: Zapatillas réplica AAA de marcas famosas
+    respuestas:
+      <<: *perfil
+      replicas_que_vende: replicas_marca
+      replicas_excluir: "no"
+    esperado:
+      nivel: no_aplica
+      alternativas: [productos_originales]
+
+  - id: multinivel-de-reclutamiento
+    comercio:
+      actividad: Network marketing
+      descripcion: Oportunidad de negocio con ingresos pasivos al invitar a otros
+    respuestas:
+      <<: *perfil
+      multinivel_ingresos: reclutamiento
+    esperado:
+      nivel: no_aplica
+
+  - id: venta-por-catalogo
+    comercio:
+      actividad: Venta por catálogo
+      descripcion: Venta directa de cosméticos por catálogo
+    respuestas:
+      <<: *perfil
+      multinivel_ingresos: productos
+    esperado:
+      nivel: condicionado
+
+  - id: curso-de-trading-con-promesas
+    comercio:
+      actividad: Mentoría de trading
+      descripcion: Masterclass y mentoría para ganar dinero con trading
+    respuestas:
+      <<: *perfil
+      financiero_que_hace: otro
+      digitales_promesa: si
+      digitales_entrega: en_vivo
+    esperado:
+      nivel: comite
+
+  - id: peptidos-sin-registro
+    comercio:
+      actividad: Venta de péptidos
+      descripcion: Péptidos importados para recuperación muscular
+    respuestas:
+      <<: *perfil
+      salud_que_vende: sin_registro
+    esperado:
+      nivel: comite
+      documentos: [registro_sanitario]
+
+  - id: tienda-de-ropa
+    comercio:
+      actividad: Tienda de ropa
+      descripcion: Ropa casual para dama y caballero
+    respuestas:
+      <<: *perfil
+    esperado:
+      nivel: aplica
+      estado: completo

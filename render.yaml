@@ -1,0 +1,38 @@
+# Publicación del evaluador en Render (https://render.com) como Blueprint.
+# Las claves no van en el repositorio: AFILIA_CLAVE_ACCESO (16 caracteres o más) y, si se usa la IA, ANTHROPIC_API_KEY
+# se escriben en el panel de Render (sync: false). Cada push a main vuelve a desplegar la app con la política nueva.
+#
+# Plan gratis, para probar: la app se duerme tras 15 minutos sin uso y el historial de evaluaciones se borra cada vez
+# que se duerme o se vuelve a desplegar. Para conservarlo (piloto): plan starter (pago) y quitar los comentarios del
+# disco y de AFILIA_DATOS_DIR.
+services:
+  - type: web
+    name: evaluador-aliados
+    runtime: python
+    region: virginia
+    plan: free
+    buildCommand: pip install -e ./app
+    startCommand: cd app && python -m afilia.web
+    healthCheckPath: /api/estado
+    autoDeploy: true
+    # disk:
+    #   name: datos
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: AFILIA_HOST
+        value: 0.0.0.0
+      - key: AFILIA_DOMINIO
+        value: paguelofacil.com
+      - key: AFILIA_SECRETO_SESION
+        generateValue: true
+      # - key: AFILIA_DATOS_DIR
+      #   value: /var/data/datos
+      - key: AFILIA_CLAVE_ACCESO
+        sync: false
+      - key: AFILIA_URL_PUBLICA
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
