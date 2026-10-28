@@ -121,3 +121,12 @@ def test_cada_opcion_tiene_etiqueta_corta_para_la_burbuja(politica):
             assert o.corto, f"{p.id} › {o.id} no tiene 'corto'"
             assert len(o.corto) <= 40, f"{p.id} › {o.id}: '{o.corto}' es muy larga para una burbuja"
         assert len(p.corta or p.texto) <= 70, f"{p.id}: agrega 'corta' (la pregunta es muy larga para la burbuja)"
+
+
+def test_las_condiciones_son_oraciones_completas(politica):
+    """Una coma sin comillas en una lista YAML parte la condición en dos ("sin integraciones de e-commerce.")."""
+    condiciones = [c for p in politica.preguntas.values() for o in p.opciones for c in o.condiciones]
+    condiciones += [c for r in politica.reglas for c in r.condiciones]
+    for c in condiciones:
+        # Al partirse, el primer pedazo siempre queda sin el punto final.
+        assert c.endswith("."), f"Condición partida o incompleta: '{c}' (¿falta poner comillas?)"
