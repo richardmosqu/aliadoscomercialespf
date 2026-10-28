@@ -1,0 +1,51 @@
+# Borradores del mensaje al comercio según el resultado. El analista los revisa antes de enviarlos.
+#
+# Tono de los modelos del equipo de CS: cordial, cercano (tú) y sin explicar criterios internos de riesgo.
+# Marcador que llena el evaluador:
+#   {nombre}          nombre comercial (o [nombre del comercio])
+# Después del texto del nivel, el evaluador agrega con viñetas los documentos, los servicios que pasan por comité y
+# las alternativas (cada bloque solo si tiene algo). Las condiciones internas no van al comercio: el analista decide
+# cómo contárselas.
+version: "2026-10-28"
+
+saludo: "Hola, {nombre}. Gracias por tu interés en formar parte de PagueloFacil."
+despedida: "Quedamos atentos. Si tienes alguna consulta, puedes responder a este correo y con gusto te ayudaremos."
+
+por_nivel:
+  aplica: >-
+    Revisamos la información de tu negocio y podemos continuar con tu afiliación.
+  condicionado: >-
+    Revisamos la información de tu negocio y podemos continuar con tu afiliación. Para completarla necesitamos
+    algunos requisitos adicionales.
+  comite: >-
+    Revisamos la información de tu negocio. Por el tipo de actividad, tu solicitud pasa por una evaluación adicional de
+    nuestro equipo de Cumplimiento. Para presentarla de la forma más completa posible, te pedimos la información de
+    abajo.
+  no_aplica: >-
+    Revisamos la información de tu negocio. Por las políticas de nuestras redes y de cumplimiento, hoy no podemos
+    procesar pagos para esta actividad tal como está planteada. Queremos ayudarte a encontrar una forma de trabajar
+    juntos:
+
+bloques:
+  documentos: "Para avanzar, por favor compártenos:"
+  servicios: "Estos servicios requieren una evaluación adicional (mientras tanto puedes cobrar con enlace de pago):"
+  alternativas: "Opciones que podemos revisar contigo:"
+  revision: "Si consideras que tu negocio se clasificó por error, envíanos más detalles de cómo funciona y nuestro equipo de Cumplimiento lo revisará."
+
+# Próximos pasos para el analista (no van al comercio).
+pasos:
+  aplica:
+    - Pedir los documentos de la lista y validar la identidad en Mi empresa.
+    - Activar la cuenta con los límites iniciales que fije Cumplimiento.
+  condicionado:
+    - Confirmar con el comercio que acepta las condiciones (por escrito si cambian cómo cobra).
+    - Pedir los documentos de la lista.
+    - Activar cuando estén completos y anotar las condiciones en la cuenta.
+  comite:
+    - Enviar al comercio el formulario en línea y el documento de Evaluación de Debida Diligencia Comercial.
+    - Llevar al comité el expediente con el resumen de este evaluador (botón "Copiar resumen").
+    - Ofrecer las alternativas mientras el comité decide (por ejemplo, empezar con enlace de pago).
+  no_aplica:
+    - Revisar con el comercio si alguna alternativa se ajusta a cómo opera de verdad.
+    - Si cree que se clasificó mal, pedir más detalles y volver a evaluar antes de responder.
+    - Enviar el mensaje con las alternativas, sin explicar criterios internos de riesgo.

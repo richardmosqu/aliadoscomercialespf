@@ -1,0 +1,215 @@
+# Preguntas que se hacen a todo comercio, sea cual sea su actividad.
+#
+# Mismo formato que las preguntas de categorias.yaml. Un nivel aquí afecta la evaluación completa.
+# servicio_comite: el servicio de PagueloFacil que pasa por comité; NO frena la afiliación (puede empezar con enlace).
+#
+# reglas: combinaciones de respuestas. Se cumplen cuando TODAS las preguntas del "si" tienen alguna de esas respuestas.
+version: "2026-10-28"
+
+preguntas:
+  - id: g_tipo
+    bloque: Perfil del comercio
+    clave: true
+    texto: ¿Cómo se va a afiliar el comercio?
+    opciones:
+      - id: natural
+        texto: Persona natural sin Aviso de Operación
+        condiciones: [Opera como cuenta personal, sin integraciones de e-commerce.]
+        documentos: [cedula, descripcion_ampliada]
+        alternativas: [cuenta_personal, formalizar_negocio]
+      - id: natural_aviso
+        texto: Persona natural con Aviso de Operación
+        documentos: [cedula, aviso_operacion, ruc_dv]
+      - id: juridica
+        texto: Persona jurídica (sociedad, fundación, asociación)
+        documentos: [registro_publico, aviso_operacion, ruc_dv, cedula]
+
+  - id: g_canal
+    bloque: Cómo vende
+    clave: true
+    tipo: multiple
+    texto: ¿Por dónde vende? (puede marcar varias)
+    opciones:
+      - id: presencial
+        texto: En un local o en persona
+      - id: web_propia
+        texto: En su sitio web
+      - id: tienda_online
+        texto: En una tienda en línea (Shopify, WooCommerce, Wix u otra)
+      - id: redes
+        texto: Por redes sociales o WhatsApp
+
+  - id: g_politicas
+    bloque: Cómo vende
+    mostrar_si: {g_canal: [web_propia, tienda_online, redes]}
+    texto: ¿Tiene publicados términos y condiciones, política de devoluciones o cancelación y un contacto visible?
+    ayuda: Es lo que revisa la evaluación de comercio, junto con el certificado SSL del sitio.
+    opciones:
+      - id: completo
+        texto: Sí, todo
+      - id: parcial
+        texto: Una parte
+        condiciones: [Completar las políticas que faltan en su sitio o redes.]
+        documentos: [politicas_web]
+        alternativas: [publicar_politicas]
+      - id: ninguno
+        texto: Nada todavía
+        condiciones: [Publicar términos y condiciones, política de devoluciones o cancelación y contacto visible.]
+        documentos: [politicas_web]
+        alternativas: [publicar_politicas]
+
+  - id: g_entrega
+    bloque: Cómo vende
+    clave: true
+    texto: ¿Cuándo recibe el cliente lo que pagó?
+    ayuda: Entre más tiempo pasa entre el pago y la entrega, más riesgo de contracargo por "no recibí el producto".
+    opciones:
+      - id: inmediata
+        texto: En el momento o el mismo día
+      - id: semana
+        texto: De 1 a 7 días (envío o cita cercana)
+      - id: mes
+        texto: De 8 a 30 días
+        condiciones: [Mostrar al cliente los tiempos de entrega antes del pago.]
+      - id: futura
+        texto: En más de 30 días (preventa, eventos, viajes, pedidos por encargo)
+        nivel: condicionado
+        motivo: Entrega a más de 30 días; más riesgo de contracargo por producto o servicio no recibido.
+        condiciones: [Política de cancelación y reembolso publicada, y comprobante de cada reserva o pedido.]
+        alternativas: [anticipo_menor, reserva_riesgo, limites_iniciales]
+
+  - id: g_cobra_para
+    bloque: Cómo vende
+    clave: true
+    texto: ¿Para quién es el dinero que se cobra con PagueloFacil?
+    opciones:
+      - id: propio
+        texto: Para el propio comercio
+      - id: terceros
+        texto: Para otros vendedores o prestadores (el comercio cobra por ellos)
+        activa: [facilitador_terceros]
+
+  - id: g_clientes
+    bloque: Riesgo
+    texto: ¿Dónde están sus clientes?
+    opciones:
+      - id: panama
+        texto: Principalmente en Panamá
+      - id: extranjero
+        texto: Muchos en el extranjero
+        condiciones: [Tarjetas internacionales (recargo de 1% y más riesgo de fraude); revisar con el comercio las validaciones antifraude y 3DS.]
+      - id: sancionados
+        texto: Vende o compra en países sancionados (listas de OFAC)
+        nivel: no_aplica
+        motivo: Los términos y condiciones excluyen comercios o clientes en países sancionados por OFAC.
+
+  - id: g_listas
+    bloque: Riesgo
+    clave: true
+    texto: ¿Cuál fue el resultado de la verificación en listas (OFAC, ONU, PEP) del comercio, su representante y sus beneficiarios finales?
+    opciones:
+      - id: limpio
+        texto: Sin coincidencias
+      - id: pendiente
+        texto: Todavía no se verifica
+        condiciones: [Hacer la verificación en listas antes de activar la cuenta.]
+      - id: posible
+        texto: Posible coincidencia, homónimo o persona expuesta políticamente (PEP)
+        nivel: comite
+        motivo: Posible coincidencia en listas o PEP; debida diligencia reforzada, el comité decide.
+        documentos: [origen_fondos]
+        alternativas: [expediente_comite]
+      - id: confirmada
+        texto: Coincidencia confirmada en una lista sancionatoria
+        nivel: no_aplica
+        motivo: Coincidencia confirmada en una lista sancionatoria; no se puede afiliar.
+
+  - id: g_historial
+    bloque: Riesgo
+    texto: ¿Ha tenido cuentas cerradas o retenidas por otro procesador o banco, o muchos contracargos?
+    opciones:
+      - id: "no"
+        texto: No, o no tiene historial
+      - id: si
+        texto: Sí
+        nivel: comite
+        motivo: Historial de cierre o de contracargos con otro procesador; el comité revisa el motivo.
+        documentos: [descripcion_ampliada]
+        alternativas: [reserva_riesgo, limites_iniciales, expediente_comite]
+
+  - id: g_ticket
+    bloque: Montos
+    texto: ¿Cuál es el monto típico de cada cobro?
+    opciones:
+      - id: hasta_100
+        texto: Hasta $100
+      - id: hasta_1000
+        texto: De $100 a $1,000
+        condiciones: [Supera el límite inicial orientativo de $100 por transacción; pedir el aumento de límite.]
+        documentos: [formulario_debida_diligencia]
+        alternativas: [aumento_limite]
+      - id: mas_1000
+        texto: Más de $1,000
+        condiciones: [Supera el límite inicial orientativo de $100 por transacción; pedir el aumento de límite con debida diligencia reforzada.]
+        documentos: [formulario_debida_diligencia, origen_fondos]
+        alternativas: [aumento_limite]
+
+  - id: g_volumen
+    bloque: Montos
+    texto: ¿Cuánto espera cobrar al mes con PagueloFacil?
+    opciones:
+      - id: hasta_1000
+        texto: Hasta $1,000
+      - id: hasta_10000
+        texto: De $1,000 a $10,000
+        condiciones: [Supera los límites mensuales iniciales ($500 persona natural, $1,000 persona jurídica); pedir el aumento de límite.]
+        alternativas: [aumento_limite]
+      - id: hasta_50000
+        texto: De $10,000 a $50,000
+        condiciones: [Supera los límites mensuales iniciales; pedir el aumento de límite.]
+        documentos: [formulario_debida_diligencia]
+        alternativas: [aumento_limite]
+      - id: mas_50000
+        texto: Más de $50,000
+        condiciones: [Supera los límites mensuales iniciales; pedir el aumento de límite.]
+        documentos: [formulario_debida_diligencia]
+        alternativas: [aumento_limite, plan_personalizado]
+
+  - id: g_productos
+    bloque: Servicios de PagueloFacil
+    clave: true
+    tipo: multiple
+    texto: ¿Qué servicios de PagueloFacil quiere usar? (puede marcar varios)
+    opciones:
+      - id: enlace
+        texto: Enlace de pago
+      - id: integracion
+        texto: Botón de pago, plugin o API en su tienda (WooCommerce, Shopify, Magento, VTEX…)
+      - id: wix
+        texto: Integración con Wix
+        servicio_comite: Integración con Wix (no tiene 3D Secure)
+        documentos: [formulario_debida_diligencia, evaluacion_debida_diligencia]
+        alternativas: [enlace_mientras_comite]
+      - id: recurrencia
+        texto: Cobros recurrentes o suscripciones
+        servicio_comite: Pagos recurrentes (habilitarlos toma aproximadamente un mes o más si se aprueban)
+        documentos: [formulario_debida_diligencia, evaluacion_debida_diligencia]
+        alternativas: [enlace_mientras_comite]
+      - id: vpos
+        texto: vPOS (cobrar sin tarjeta presente, con los datos que da el cliente)
+        condiciones: [vPOS exige una carta de autorización firmada por el tarjetahabiente en cada transacción.]
+        documentos: [carta_autorizacion_vpos]
+        alternativas: [carta_vpos]
+      - id: presencial
+        texto: Cobro presencial (QR)
+
+reglas:
+  - id: personal_con_integracion
+    si: {g_tipo: [natural], g_productos: [integracion, wix]}
+    condiciones: [Las cuentas personales no permiten integraciones de e-commerce; para el botón o plugin necesita cuenta comercial.]
+    alternativas: [formalizar_negocio, cuenta_personal]
+
+  - id: tienda_sin_politicas
+    si: {g_canal: [web_propia, tienda_online], g_politicas: [ninguno]}
+    nivel: condicionado
+    motivo: Vende en línea sin términos, política de devoluciones ni contacto publicados; no puede defender sus contracargos.
