@@ -421,7 +421,7 @@
     const caminosLista = r.alternativas.filter((a) => a.id !== "expediente_comite" || r.nivel === "comite");
     const caminos = caminosLista.length ? [
       el("p", { class: "grupo-titulo", text: "Caminos para afiliar" }),
-      el("div", { class: "burbujas" }, caminosLista.map((a, i) => {
+      el("div", { class: "burbujas caminos" }, caminosLista.map((a, i) => {
         const abierto = sesion.abiertos.has(a.id);
         return nuevo(el("button", {
           type: "button", class: `burbuja camino${abierto ? " abierto" : ""}`, "aria-expanded": abierto ? "true" : "false",

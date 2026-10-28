@@ -14,7 +14,7 @@
 #     activa: [ids]      → suma otras categorías (por ejemplo, el tour de bares activa experiencias)
 #     condiciones, documentos, alternativas, servicio_comite
 #   mostrar_si: {pregunta: [opciones]} → la pregunta aparece solo con esas respuestas.
-version: "2026-10-28.2"
+version: "2026-10-28.3"
 estado: propuesta
 
 categorias:
@@ -628,7 +628,7 @@ categorias:
             corto: "📦 Dropshipping"
             nivel: condicionado
             motivo: Dropshipping; el comercio responde por la entrega y hay riesgo de contracargo por demoras.
-            condiciones: [Tiempos de entrega, rastreo y política de devoluciones publicados.]
+            condiciones: ["Tiempos de entrega, rastreo y política de devoluciones publicados."]
             alternativas: [publicar_politicas]
           - id: terceros
             texto: Para otros vendedores o prestadores, y el comercio se queda con una comisión (marketplace, plataforma, agencia)
@@ -812,7 +812,7 @@ categorias:
           - id: envio
             texto: Envío de archivos o enlaces por correo o WhatsApp
             corto: "📩 Por correo o WhatsApp"
-            condiciones: [Guardar evidencia de entrega (correo, registro de descarga) para defender contracargos.]
+            condiciones: ["Guardar evidencia de entrega (correo, registro de descarga) para defender contracargos."]
           - id: en_vivo
             texto: Sesiones en vivo
             corto: "🎥 Sesiones en vivo"
